@@ -67,44 +67,45 @@
   </div>
 
   <script>
-    document.getElementById('myButton').addEventListener('click', () => {
-      document.getElementById('formulario').style.display = 'block';
+  document.getElementById('myButton').addEventListener('click', () => {
+    document.getElementById('formulario').style.display = 'block';
+  });
+
+  document.getElementById('leadForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    alert('Formulário enviado!');
+    document.getElementById('formulario').style.display = 'none';
+  });
+
+  const start = async () => {
+    const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+      container: document.querySelector("#ar-container"),
+      imageTargetSrc: "https://pralhass.github.io/demos/targets.mind",
     });
 
-    document.getElementById('leadForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      alert('Formulário enviado!');
-      document.getElementById('formulario').style.display = 'none';
+    const {renderer, scene, camera} = mindarThree;
+
+    const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+    scene.add(light);
+
+    const loader = new THREE.GLTFLoader();
+    loader.load('https://modelviewer.dev/shared-assets/models/Astronaut.glb', function (gltf) {
+      const model = gltf.scene;
+      model.scale.set(0.5, 0.5, 0.5);
+      model.position.set(0, 0, 0);
+      mindarThree.addAnchor(0).group.add(model);
+    }, undefined, function (error) {
+      console.error('Erro ao carregar o modelo:', error);
     });
 
-    const start = async () => {
-      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-        container: document.querySelector("#ar-container"),
-        imageTargetSrc: "https://pralhass.github.io/demos/targets.mind",
-      });
+    await mindarThree.start();
+    renderer.setAnimationLoop(() => {
+      renderer.render(scene, camera);
+    });
+  };
 
-      const {renderer, scene, camera} = mindarThree;
+  start();
+</script>
 
-      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-      scene.add(light);
-
-      const loader = new THREE.GLTFLoader();
-      loader.load('https://www.stannah.com.mx/wp-content/uploads/mx/Siena260_3.glb', function (gltf) {
-        const model = gltf.scene;
-        model.scale.set(0.5, 0.5, 0.5);
-        model.position.set(0, 0, 0);
-        mindarThree.addAnchor(0).group.add(model);
-      }, undefined, function (error) {
-        console.error('Erro ao carregar o modelo:', error);
-      });
-
-      await mindarThree.start();
-      renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera);
-      });
-    };
-
-    start();
-  </script>
 </body>
 </html>
