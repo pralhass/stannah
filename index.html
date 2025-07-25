@@ -3,25 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <title>Selecionar ponto focal</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      input, button {
+        padding: 10px;
+        font-size: 16px;
+        margin: 10px;
+        width: 300px;
+      }
+      img {
+        margin-top: 20px;
+        max-width: 80%;
+        cursor: crosshair;
+        border: 1px solid #ccc;
+      }
+    </style>
   </head>
-  <body style="text-align:center; font-family:sans-serif;">
-    <h2>Clica na imagem para escolher o ponto focal</h2>
-    <img src="https://via.placeholder.com/800x500" id="img" style="max-width:80%; cursor: crosshair;" />
+  <body>
+    <h2>Seleciona a imagem e clica no ponto focal</h2>
+
+    <input type="text" id="imageUrlInput" placeholder="Cola aqui o URL da imagem" />
+    <br />
+    <button onclick="loadImage()">Carregar imagem</button>
+    <br />
+    <img id="image" style="display:none;" />
+
     <script>
-      const img = document.getElementById("img");
+      const img = document.getElementById("image");
+      const input = document.getElementById("imageUrlInput");
+
+      function loadImage() {
+        const url = input.value.trim();
+        if (!url) {
+          alert("Por favor, insere um URL de imagem válido.");
+          return;
+        }
+        img.src = url;
+        img.style.display = "block";
+      }
+
       img.addEventListener("click", function (e) {
         const rect = img.getBoundingClientRect();
         const x = (e.clientX - rect.left) / img.width;
         const y = (e.clientY - rect.top) / img.height;
+
+        const data = {
+          focus_x: x.toFixed(2),
+          focus_y: y.toFixed(2),
+          image_url: img.src
+        };
+
         fetch("https://hook.us1.make.com/https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            focus_x: x.toFixed(2),
-            focus_y: y.toFixed(2),
-            image_url: img.src
-          })
+          body: JSON.stringify(data)
         });
+
         alert(`Coordenadas enviadas:\nX: ${x.toFixed(2)}\nY: ${y.toFixed(2)}`);
       });
     </script>
