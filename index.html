@@ -7,9 +7,9 @@
       body {
         font-family: sans-serif;
         text-align: center;
-        margin-top: 50px;
+        margin-top: 40px;
       }
-      input, button {
+      input, select, button {
         padding: 10px;
         font-size: 16px;
         margin: 10px;
@@ -22,13 +22,23 @@
         border: 1px solid #ccc;
       }
     </style>
-
-      
   </head>
   <body>
-    <h2>Seleciona a imagem e clica no ponto focal</h2>
+    <h2>Preenche os dados e clica no ponto focal da imagem</h2>
 
-    <input type="text" id="imageUrlInput" placeholder="Cola aqui o URL da imagem" />
+    <input type="text" id="title" placeholder="Título" />
+    <br />
+    <input type="text" id="subtitle" placeholder="Subtítulo" />
+    <br />
+    <input type="text" id="cta" placeholder="Call to Action" />
+    <br />
+    <input type="text" id="imageUrlInput" placeholder="URL da Imagem" />
+    <br />
+    <input type="text" id="videoUrlInput" placeholder="URL do Vídeo" />
+    <br />
+    <select id="template">
+      <option value="1st Promo">1st Promo</option>
+    </select>
     <br />
     <button onclick="loadImage()">Carregar imagem</button>
     <br />
@@ -36,10 +46,10 @@
 
     <script>
       const img = document.getElementById("image");
-      const input = document.getElementById("imageUrlInput");
+      const imageUrlInput = document.getElementById("imageUrlInput");
 
       function loadImage() {
-        const url = input.value.trim();
+        const url = imageUrlInput.value.trim();
         if (!url) {
           alert("Por favor, insere um URL de imagem válido.");
           return;
@@ -54,9 +64,14 @@
         const y = (e.clientY - rect.top) / img.height;
 
         const data = {
+          title: document.getElementById("title").value,
+          subtitle: document.getElementById("subtitle").value,
+          cta: document.getElementById("cta").value,
+          image_url: document.getElementById("imageUrlInput").value,
+          video_url: document.getElementById("videoUrlInput").value,
+          template: document.getElementById("template").value,
           focus_x: x.toFixed(2),
-          focus_y: y.toFixed(2),
-          image_url: img.src
+          focus_y: y.toFixed(2)
         };
 
         fetch("https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv", {
@@ -65,7 +80,7 @@
           body: JSON.stringify(data)
         });
 
-        alert(`Coordenadas enviadas:\nX: ${x.toFixed(2)}\nY: ${y.toFixed(2)}`);
+        alert(`Dados enviados com sucesso!\nX: ${x.toFixed(2)}\nY: ${y.toFixed(2)}`);
       });
     </script>
   </body>
