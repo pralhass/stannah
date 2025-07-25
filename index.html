@@ -1,110 +1,29 @@
-
 <!DOCTYPE html>
 <html lang="pt">
-<head>
-  <meta charset="UTF-8">
-  <title>Stannah AR Test - Astronauta</title>
-
-  <!-- Three.js + GLTFLoader via CDN -->
-  <script src="https://unpkg.com/three@0.136.0/build/three.min.js"></script>
-  <script src="https://unpkg.com/three@0.136.0/examples/js/loaders/GLTFLoader.js"></script>
-
-  <!-- MindAR -->
-  <script src="https://unpkg.com/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
-
-  <style>
-    body, html { margin: 0; padding: 0; overflow: hidden; font-family: Arial, sans-serif; }
-    #ar-container { width: 100%; height: 500px; position: relative; }
-    #myButton {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background: #027b89;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 10;
-    }
-    #formulario {
-      display: none;
-      position: absolute;
-      top: 70px;
-      right: 20px;
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      z-index: 10;
-      width: 250px;
-    }
-    #formulario input, #formulario button {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    #formulario button {
-      background: #027b89;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <div id="ar-container">
-    <button id="myButton">Saber Mais</button>
-    <div id="formulario">
-      <form id="leadForm">
-        <input type="text" name="nome" placeholder="Nome" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <button type="submit">Enviar</button>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    document.getElementById('myButton').addEventListener('click', () => {
-      document.getElementById('formulario').style.display = 'block';
-    });
-
-    document.getElementById('leadForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      alert('Formulário enviado!');
-      document.getElementById('formulario').style.display = 'none';
-    });
-
-    const start = async () => {
-      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-        container: document.querySelector("#ar-container"),
-        imageTargetSrc: "https://pralhass.github.io/demos/targets.mind",
+  <head>
+    <meta charset="UTF-8" />
+    <title>Selecionar ponto focal</title>
+  </head>
+  <body style="text-align:center; font-family:sans-serif;">
+    <h2>Clica na imagem para escolher o ponto focal</h2>
+    <img src="https://via.placeholder.com/800x500" id="img" style="max-width:80%; cursor: crosshair;" />
+    <script>
+      const img = document.getElementById("img");
+      img.addEventListener("click", function (e) {
+        const rect = img.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / img.width;
+        const y = (e.clientY - rect.top) / img.height;
+        fetch("https://hook.us1.make.com/https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            focus_x: x.toFixed(2),
+            focus_y: y.toFixed(2),
+            image_url: img.src
+          })
+        });
+        alert(`Coordenadas enviadas:\nX: ${x.toFixed(2)}\nY: ${y.toFixed(2)}`);
       });
-
-      const {renderer, scene, camera} = mindarThree;
-
-      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-      scene.add(light);
-
-      const loader = new THREE.GLTFLoader();
-      loader.load('https://modelviewer.dev/shared-assets/models/Astronaut.glb', function (gltf) {
-        const model = gltf.scene;
-        model.scale.set(0.5, 0.5, 0.5);
-        model.position.set(0, 0, 0);
-        mindarThree.addAnchor(0).group.add(model);
-      }, undefined, function (error) {
-        console.error('Erro ao carregar o modelo:', error);
-      });
-
-      await mindarThree.start();
-      renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera);
-      });
-    };
-
-    start();
-  </script>
-</body>
+    </script>
+  </body>
 </html>
