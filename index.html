@@ -22,7 +22,6 @@
         border: 1px solid #ccc;
       }
     </style>
-    
   </head>
   <body>
     <h2>Preenche os dados e clica no ponto focal da imagem</h2>
@@ -49,12 +48,19 @@
       const img = document.getElementById("image");
       const imageUrlInput = document.getElementById("imageUrlInput");
 
-      function loadImage() {
-        const url = imageUrlInput.value.trim();
-        if (!url) {
-          alert("Por favor, insere um URL de imagem válido.");
-          return;
+      // Função para converter links do Google Drive
+      function convertGoogleDriveUrl(url) {
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+        if (match && match[1]) {
+          const id = match[1];
+          return `https://drive.google.com/uc?export=view&id=${id}`;
         }
+        return url; // devolve original se não for Drive
+      }
+
+      function loadImage() {
+        const rawUrl = imageUrlInput.value.trim();
+        const url = convertGoogleDriveUrl(rawUrl);
         img.src = url;
         img.style.display = "block";
       }
