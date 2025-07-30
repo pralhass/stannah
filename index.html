@@ -25,7 +25,7 @@
   </head>
   <body>
     
-    <h2>Preenche os dados e clica no ponto focal da imagem!!!</h2>
+    <h2>Preenche os dados e clica no ponto focal da imagem</h2>
 
     <input type="text" id="title" placeholder="Título" />
     <br />
@@ -58,11 +58,6 @@ function convertGoogleDriveUrl(url) {
   }
   return url;
 }
-
-
-
-
-      
       function loadImage() {
         const rawUrl = imageUrlInput.value.trim();
         const url = convertGoogleDriveUrl(rawUrl);
@@ -72,9 +67,9 @@ function convertGoogleDriveUrl(url) {
 
       img.addEventListener("click", function (e) {
         const rect = img.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / img.width;
-        const y = (e.clientY - rect.top) / img.height;
-
+        const x = ((e.clientX - rect.left) / img.width) * 100;
+        const y = ((e.clientY - rect.top) / img.height) * 100;
+      
         const data = {
           title: document.getElementById("title").value,
           subtitle: document.getElementById("subtitle").value,
@@ -82,18 +77,19 @@ function convertGoogleDriveUrl(url) {
           image_url: document.getElementById("imageUrlInput").value,
           video_url: document.getElementById("videoUrlInput").value,
           template: document.getElementById("template").value,
-          focus_x: x.toFixed(2),
-          focus_y: y.toFixed(2)
+          focus_x: Math.round(x),
+          focus_y: Math.round(y)
         };
-
+      
         fetch("https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
-
-        alert(`Dados enviados com sucesso!\nX: ${x.toFixed(2)}\nY: ${y.toFixed(2)}`);
+      
+        alert(`Dados enviados com sucesso!\nX: ${Math.round(x)}\nY: ${Math.round(y)}`);
       });
+
     </script>
   </body>
 </html>
