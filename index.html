@@ -18,8 +18,12 @@
       img {
         margin-top: 20px;
         max-width: 80%;
-        cursor: crosshair;
         border: 1px solid #ccc;
+      }
+      #previewTemplate {
+        margin-top: 20px;
+        max-width: 400px;
+        display: none;
       }
     </style>
   </head>
@@ -47,6 +51,8 @@
       <option value="NewLookV4">New Look V4</option>
     </select>
     <br />
+    <img id="previewTemplate" alt="Pré-visualização do template" />
+    <br />
     <button onclick="loadImage()">Carregar imagem</button>
     <br />
     <img id="image" style="display:none;" />
@@ -55,16 +61,28 @@
       const img = document.getElementById("image");
       const imageUrlInput = document.getElementById("imageUrlInput");
       const templateSelect = document.getElementById("template");
+      const previewImg = document.getElementById("previewTemplate");
 
-      // Mapa de templates para URLs de imagem (substitui pelos teus URLs reais)
-      const templateImages = {
-        "1st Promo": "https://via.placeholder.com/800x400?text=1st+Promo",
-        "StannahGuidelines": "https://www.stannah.com/media/.renditions/wysiwyg/Stannah_73_of_108_768x512.jpg",
-        "NewLookV1": "https://via.placeholder.com/800x400?text=New+Look+V1",
-        "NewLookV2": "https://via.placeholder.com/800x400?text=New+Look+V2",
-        "NewLookV3": "https://via.placeholder.com/800x400?text=New+Look+V3",
-        "NewLookV4": "https://via.placeholder.com/800x400?text=New+Look+V4"
+      // Mapa de templates para imagens de pré-visualização
+      const templatePreviews = {
+        "1st Promo": "https://via.placeholder.com/400x200?text=1st+Promo",
+        "StannahGuidelines": "https://www.stannah.com/media/.renditions/wysiwyg/why-stannah-large_1.jpg",
+        "NewLookV1": "https://via.placeholder.com/400x200?text=New+Look+V1",
+        "NewLookV2": "https://via.placeholder.com/400x200?text=New+Look+V2",
+        "NewLookV3": "https://via.placeholder.com/400x200?text=New+Look+V3",
+        "NewLookV4": "https://via.placeholder.com/400x200?text=New+Look+V4"
       };
+
+      // Atualiza imagem de pré-visualização ao mudar template
+      templateSelect.addEventListener("change", function () {
+        const selected = templateSelect.value;
+        if (templatePreviews[selected]) {
+          previewImg.src = templatePreviews[selected];
+          previewImg.style.display = "block";
+        } else {
+          previewImg.style.display = "none";
+        }
+      });
 
       // Função para converter links do Google Drive
       function convertGoogleDriveUrl(url) {
@@ -76,7 +94,7 @@
         return url;
       }
 
-      // Botão manual para carregar imagem via URL
+      // Carrega imagem real a partir do campo URL
       function loadImage() {
         const rawUrl = imageUrlInput.value.trim();
         const url = convertGoogleDriveUrl(rawUrl);
@@ -84,19 +102,7 @@
         img.style.display = "block";
       }
 
-      // Altera imagem automaticamente quando muda o template
-      templateSelect.addEventListener("change", function () {
-        const selected = templateSelect.value;
-        if (templateImages[selected]) {
-          img.src = templateImages[selected];
-          img.style.display = "block";
-          imageUrlInput.value = templateImages[selected];
-        } else {
-          img.style.display = "none";
-        }
-      });
-
-      // Captura clique na imagem e envia dados via webhook
+      // Captura clique na imagem real
       img.addEventListener("click", function (e) {
         const rect = img.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / img.width) * 100;
