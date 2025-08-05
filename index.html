@@ -24,7 +24,7 @@
     </style>
   </head>
   <body>
-    
+
     <h2>Preenche os dados e clica no ponto focal da imagem</h2>
 
     <input type="text" id="title" placeholder="Título" />
@@ -38,12 +38,13 @@
     <input type="text" id="videoUrlInput" placeholder="URL do Vídeo" />
     <br />
     <select id="template">
+      <option value="">Seleciona um template</option>
       <option value="1st Promo">1st Promo</option>
-      <option value="1st Promo">StannahGuidelines</option>
-      <option value="1st Promo">NewLookV1</option>
-      <option value="1st Promo">NewLookV2</option>
-      <option value="1st Promo">NewLookV3</option>
-      <option value="1st Promo">NewLookV4</option>
+      <option value="StannahGuidelines">Stannah Guidelines</option>
+      <option value="NewLookV1">New Look V1</option>
+      <option value="NewLookV2">New Look V2</option>
+      <option value="NewLookV3">New Look V3</option>
+      <option value="NewLookV4">New Look V4</option>
     </select>
     <br />
     <button onclick="loadImage()">Carregar imagem</button>
@@ -53,16 +54,29 @@
     <script>
       const img = document.getElementById("image");
       const imageUrlInput = document.getElementById("imageUrlInput");
+      const templateSelect = document.getElementById("template");
+
+      // Mapa de templates para URLs de imagem (substitui pelos teus URLs reais)
+      const templateImages = {
+        "1st Promo": "https://via.placeholder.com/800x400?text=1st+Promo",
+        "StannahGuidelines": "https://www.stannah.com/media/.renditions/wysiwyg/Stannah_73_of_108_768x512.jpg",
+        "NewLookV1": "https://via.placeholder.com/800x400?text=New+Look+V1",
+        "NewLookV2": "https://via.placeholder.com/800x400?text=New+Look+V2",
+        "NewLookV3": "https://via.placeholder.com/800x400?text=New+Look+V3",
+        "NewLookV4": "https://via.placeholder.com/800x400?text=New+Look+V4"
+      };
 
       // Função para converter links do Google Drive
-function convertGoogleDriveUrl(url) {
-  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
-  if (match && match[1]) {
-    const id = match[1];
-    return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
-  }
-  return url;
-}
+      function convertGoogleDriveUrl(url) {
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+        if (match && match[1]) {
+          const id = match[1];
+          return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
+        }
+        return url;
+      }
+
+      // Botão manual para carregar imagem via URL
       function loadImage() {
         const rawUrl = imageUrlInput.value.trim();
         const url = convertGoogleDriveUrl(rawUrl);
@@ -70,11 +84,24 @@ function convertGoogleDriveUrl(url) {
         img.style.display = "block";
       }
 
+      // Altera imagem automaticamente quando muda o template
+      templateSelect.addEventListener("change", function () {
+        const selected = templateSelect.value;
+        if (templateImages[selected]) {
+          img.src = templateImages[selected];
+          img.style.display = "block";
+          imageUrlInput.value = templateImages[selected];
+        } else {
+          img.style.display = "none";
+        }
+      });
+
+      // Captura clique na imagem e envia dados via webhook
       img.addEventListener("click", function (e) {
         const rect = img.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / img.width) * 100;
         const y = ((e.clientY - rect.top) / img.height) * 100;
-      
+
         const data = {
           title: document.getElementById("title").value,
           subtitle: document.getElementById("subtitle").value,
@@ -85,39 +112,15 @@ function convertGoogleDriveUrl(url) {
           focus_x: Math.round(x),
           focus_y: Math.round(y)
         };
-      
+
         fetch("https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
-      
+
         alert(`Dados enviados com sucesso!\nX: ${Math.round(x)}\nY: ${Math.round(y)}`);
       });
-const templateSelect = document.getElementById("template");
-
-// Mapa de templates para URLs de imagem
-const templateImages = {
-  "1st Promo": "https://www.stannah.com/media/.renditions/wysiwyg/Stannah_73_of_108_768x512.jpg",
-  "StannahGuidelines": "https://exemplo.com/imagem2.jpg",
-  "NewLookV1": "https://exemplo.com/imagem3.jpg",
-  "NewLookV2": "https://exemplo.com/imagem4.jpg",
-  "NewLookV3": "https://exemplo.com/imagem5.jpg",
-  "NewLookV4": "https://exemplo.com/imagem6.jpg"
-};
-
-// Atualiza imagem ao mudar o template
-templateSelect.addEventListener("change", function () {
-  const selected = templateSelect.value;
-  if (templateImages[selected]) {
-    img.src = templateImages[selected];
-    img.style.display = "block";
-    imageUrlInput.value = templateImages[selected]; // também atualiza o campo de input
-  } else {
-    img.style.display = "none";
-  }
-});
-
     </script>
   </body>
 </html>
