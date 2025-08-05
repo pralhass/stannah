@@ -57,8 +57,6 @@
     <br />
     <input type="text" id="imageUrlInput" placeholder="URL da Imagem" />
     <br />
-    <input type="text" id="videoUrlInput" placeholder="URL do Vídeo" />
-    <br />
 
     <button onclick="loadImage()">Carregar imagem</button>
     <br />
@@ -117,7 +115,6 @@
           subtitle: document.getElementById("subtitle"),
           cta: document.getElementById("cta"),
           imageUrl: document.getElementById("imageUrlInput"),
-          videoUrl: document.getElementById("videoUrlInput"),
           template: document.getElementById("template")
         };
 
@@ -133,7 +130,6 @@
               subtitle: "Subtítulo",
               cta: "Call to Action",
               imageUrl: "URL da Imagem",
-              videoUrl: "URL do Vídeo",
               template: "Template"
             };
             missingFields.push(labelMap[key]);
@@ -156,7 +152,6 @@
           subtitle: fields.subtitle.value.trim(),
           cta: fields.cta.value.trim(),
           image_url: fields.imageUrl.value.trim(),
-          video_url: fields.videoUrl.value.trim(),
           template: fields.template.value,
           focus_x: Math.round(x),
           focus_y: Math.round(y)
