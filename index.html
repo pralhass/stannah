@@ -94,6 +94,29 @@ function convertGoogleDriveUrl(url) {
       
         alert(`Dados enviados com sucesso!\nX: ${Math.round(x)}\nY: ${Math.round(y)}`);
       });
+const templateSelect = document.getElementById("template");
+
+// Mapa de templates para URLs de imagem
+const templateImages = {
+  "1st Promo": "https://www.stannah.com/media/.renditions/wysiwyg/Stannah_73_of_108_768x512.jpg",
+  "StannahGuidelines": "https://exemplo.com/imagem2.jpg",
+  "NewLookV1": "https://exemplo.com/imagem3.jpg",
+  "NewLookV2": "https://exemplo.com/imagem4.jpg",
+  "NewLookV3": "https://exemplo.com/imagem5.jpg",
+  "NewLookV4": "https://exemplo.com/imagem6.jpg"
+};
+
+// Atualiza imagem ao mudar o template
+templateSelect.addEventListener("change", function () {
+  const selected = templateSelect.value;
+  if (templateImages[selected]) {
+    img.src = templateImages[selected];
+    img.style.display = "block";
+    imageUrlInput.value = templateImages[selected]; // também atualiza o campo de input
+  } else {
+    img.style.display = "none";
+  }
+});
 
     </script>
   </body>
