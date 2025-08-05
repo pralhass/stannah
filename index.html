@@ -15,6 +15,9 @@
         margin: 10px;
         width: 300px;
       }
+      input.error, select.error {
+        border: 2px solid red;
+      }
       img {
         margin-top: 20px;
         max-width: 80%;
@@ -31,16 +34,7 @@
 
     <h2>Preenche os dados e clica no ponto focal da imagem</h2>
 
-    <input type="text" id="title" placeholder="Título" />
-    <br />
-    <input type="text" id="subtitle" placeholder="Subtítulo" />
-    <br />
-    <input type="text" id="cta" placeholder="Call to Action" />
-    <br />
-    <input type="text" id="imageUrlInput" placeholder="URL da Imagem" />
-    <br />
-    <input type="text" id="videoUrlInput" placeholder="URL do Vídeo" />
-    <br />
+    <!-- CAMPO TEMPLATE PRIMEIRO -->
     <select id="template">
       <option value="">Seleciona um template</option>
       <option value="1st Promo">1st Promo</option>
@@ -53,6 +47,19 @@
     <br />
     <img id="previewTemplate" alt="Pré-visualização do template" />
     <br />
+
+    <!-- RESTO DOS CAMPOS -->
+    <input type="text" id="title" placeholder="Título" />
+    <br />
+    <input type="text" id="subtitle" placeholder="Subtítulo" />
+    <br />
+    <input type="text" id="cta" placeholder="Call to Action" />
+    <br />
+    <input type="text" id="imageUrlInput" placeholder="URL da Imagem" />
+    <br />
+    <input type="text" id="videoUrlInput" placeholder="URL do Vídeo" />
+    <br />
+
     <button onclick="loadImage()">Carregar imagem</button>
     <br />
     <img id="image" style="display:none;" />
@@ -63,28 +70,7 @@
       const templateSelect = document.getElementById("template");
       const previewImg = document.getElementById("previewTemplate");
 
-      // Mapa de templates para imagens de pré-visualização
-      const templatePreviews = {
-        "1st Promo": "https://via.placeholder.com/400x200?text=1st+Promo",
-        "StannahGuidelines": "https://www.stannah.com/media/.renditions/wysiwyg/why-stannah-large_1.jpg",
-        "NewLookV1": "https://via.placeholder.com/400x200?text=New+Look+V1",
-        "NewLookV2": "https://via.placeholder.com/400x200?text=New+Look+V2",
-        "NewLookV3": "https://drive.google.com/file/d/1lzNWQFXRwnv0n5GrCfLl284TTLyyF5jM/view?usp=sharing",
-        "NewLookV4": "https://via.placeholder.com/400x200?text=New+Look+V4"
-      };
-
-      // Atualiza imagem de pré-visualização ao mudar template
-      templateSelect.addEventListener("change", function () {
-        const selected = templateSelect.value;
-        if (templatePreviews[selected]) {
-          previewImg.src = templatePreviews[selected];
-          previewImg.style.display = "block";
-        } else {
-          previewImg.style.display = "none";
-        }
-      });
-
-      // Função para converter links do Google Drive
+      // Função para converter link da Google Drive em thumbnail
       function convertGoogleDriveUrl(url) {
         const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
         if (match && match[1]) {
@@ -94,7 +80,29 @@
         return url;
       }
 
-      // Carrega imagem real a partir do campo URL
+      // Links reais dos templates na Drive (coloca aqui os teus)
+      const templatePreviewsRaw = {
+        "1st Promo": "https://drive.google.com/file/d/1lzNWQFXRwnv0n5GrCfLl284TTLyyF5jM/view?usp=sharing",
+        "StannahGuidelines": "https://drive.google.com/file/d/1Ue7pL7t9z3CPOMQk-l3ZEdiytb4jNKD7/view?usp=sharing",
+        "NewLookV1": "https://drive.google.com/file/d/1nD6s4Tx-7s3fCkTmiVbMiAT4k3Igq4CZ/view?usp=sharing",
+        "NewLookV2": "https://drive.google.com/file/d/1sE3VXhXTrVt2ZlDjAGUNZr6zazJfKbyA/view?usp=sharing",
+        "NewLookV3": "https://drive.google.com/file/d/1vmJ9KHqQO6hEeyzfsKyFVb8PZPZvq1yF/view?usp=sharing",
+        "NewLookV4": "https://drive.google.com/file/d/1ow1xF9G6E4C-NPB0_My4Ct6XThqRHpK8/view?usp=sharing"
+      };
+
+      // Atualiza imagem de pré-visualização ao mudar template
+      templateSelect.addEventListener("change", function () {
+        const selected = templateSelect.value;
+        if (templatePreviewsRaw[selected]) {
+          const converted = convertGoogleDriveUrl(templatePreviewsRaw[selected]);
+          previewImg.src = converted;
+          previewImg.style.display = "block";
+        } else {
+          previewImg.style.display = "none";
+        }
+      });
+
+      // Botão para carregar imagem real
       function loadImage() {
         const rawUrl = imageUrlInput.value.trim();
         const url = convertGoogleDriveUrl(rawUrl);
@@ -102,19 +110,54 @@
         img.style.display = "block";
       }
 
-      // Captura clique na imagem real
+      // Clique na imagem real para capturar coordenadas
       img.addEventListener("click", function (e) {
+        const fields = {
+          title: document.getElementById("title"),
+          subtitle: document.getElementById("subtitle"),
+          cta: document.getElementById("cta"),
+          imageUrl: document.getElementById("imageUrlInput"),
+          videoUrl: document.getElementById("videoUrlInput"),
+          template: document.getElementById("template")
+        };
+
+        let missingFields = [];
+
+        // Verificar campos obrigatórios
+        Object.entries(fields).forEach(([key, field]) => {
+          const isEmpty = !field.value.trim();
+          field.classList.toggle("error", isEmpty);
+          if (isEmpty) {
+            const labelMap = {
+              title: "Título",
+              subtitle: "Subtítulo",
+              cta: "Call to Action",
+              imageUrl: "URL da Imagem",
+              videoUrl: "URL do Vídeo",
+              template: "Template"
+            };
+            missingFields.push(labelMap[key]);
+          }
+        });
+
+        if (missingFields.length > 0) {
+          alert(
+            `Por favor preenche os seguintes campos obrigatórios:\n- ${missingFields.join("\n- ")}`
+          );
+          return;
+        }
+
         const rect = img.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / img.width) * 100;
         const y = ((e.clientY - rect.top) / img.height) * 100;
 
         const data = {
-          title: document.getElementById("title").value,
-          subtitle: document.getElementById("subtitle").value,
-          cta: document.getElementById("cta").value,
-          image_url: document.getElementById("imageUrlInput").value,
-          video_url: document.getElementById("videoUrlInput").value,
-          template: document.getElementById("template").value,
+          title: fields.title.value.trim(),
+          subtitle: fields.subtitle.value.trim(),
+          cta: fields.cta.value.trim(),
+          image_url: fields.imageUrl.value.trim(),
+          video_url: fields.videoUrl.value.trim(),
+          template: fields.template.value,
           focus_x: Math.round(x),
           focus_y: Math.round(y)
         };
