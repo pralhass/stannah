@@ -35,7 +35,7 @@
 
     img {
       margin-top: 20px;
-      max-width: 80%;
+      max-width: 100%;
       border: 1px solid #ccc;
     }
 
@@ -56,6 +56,22 @@
 
     #submitButton:hover {
       background-color: #0056b3;
+    }
+
+    #imageContainer {
+      position: relative;
+      display: inline-block;
+    }
+
+    #focusMarker {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: red;
+      border-radius: 50%;
+      pointer-events: none;
+      display: none;
+      z-index: 10;
     }
   </style>
 </head>
@@ -88,7 +104,11 @@
 
   <button onclick="loadImage()">Carregar imagem</button>
   <br />
-  <img id="image" style="display:none;" />
+
+  <div id="imageContainer">
+    <img id="image" style="display:none;" />
+    <div id="focusMarker"></div>
+  </div>
   <br />
   <button id="submitButton">Enviar</button>
 
@@ -97,6 +117,7 @@
     const imageUrlInput = document.getElementById("imageUrlInput");
     const templateSelect = document.getElementById("template");
     const previewImg = document.getElementById("previewTemplate");
+    const marker = document.getElementById("focusMarker");
 
     const charLimits = {
       title: 40,
@@ -167,13 +188,26 @@
       const url = convertGoogleDriveUrl(rawUrl);
       img.src = url;
       img.style.display = "block";
+      marker.style.display = "none"; // esconder marcador anterior
+      focusX = null;
+      focusY = null;
     }
 
     img.addEventListener("click", function (e) {
       const rect = img.getBoundingClientRect();
-      focusX = Math.round(((e.clientX - rect.left) / img.width) * 100);
-      focusY = Math.round(((e.clientY - rect.top) / img.height) * 100);
-      alert(`Ponto focal selecionado:\nX: ${focusX}%\nY: ${focusY}%`);
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      focusX = Math.round((clickX / img.width) * 100);
+      focusY = Math.round((clickY / img.height) * 100);
+
+      const containerRect = document.getElementById("imageContainer").getBoundingClientRect();
+      const offsetX = clickX - 25;
+      const offsetY = clickY - 25;
+
+      marker.style.left = `${offsetX}px`;
+      marker.style.top = `${offsetY}px`;
+      marker.style.display = "block";
     });
 
     document.getElementById("submitButton").addEventListener("click", function () {
