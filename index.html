@@ -102,6 +102,10 @@
   <input type="text" id="imageUrlInput" placeholder="URL da Imagem" />
   <br />
 
+  <!-- Campo opcional -->
+  <input type="text" id="videoUrlInput" placeholder="URL do Vídeo (opcional)" />
+  <br />
+
   <button onclick="loadImage()">Carregar imagem</button>
   <br />
 
@@ -115,6 +119,7 @@
   <script>
     const img = document.getElementById("image");
     const imageUrlInput = document.getElementById("imageUrlInput");
+    const videoUrlInput = document.getElementById("videoUrlInput"); // opcional
     const templateSelect = document.getElementById("template");
     const previewImg = document.getElementById("previewTemplate");
     const marker = document.getElementById("focusMarker");
@@ -156,6 +161,7 @@
       fields[name].addEventListener("input", () => updateCharCount(name));
     });
 
+    // Converte links da Drive no formato /file/d/ID/view para thumbnail
     function convertGoogleDriveUrl(url) {
       const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
       if (match && match[1]) {
@@ -165,6 +171,7 @@
       return url;
     }
 
+    // Pré-visualizações dos templates (Drive)
     const templatePreviewsRaw = {
       "StannahGuidelines": "https://drive.google.com/file/d/1G9oWyGbD2c9oUwmGmI-SUYYTm2RuIldW/view?usp=sharing",
       "NewLookV2": "https://drive.google.com/file/d/1jR5Upc8gsuzTV2ykx9qDYNAaXjksVhOo/view?usp=drive_link",
@@ -201,8 +208,7 @@
       focusX = Math.round((clickX / img.width) * 100);
       focusY = Math.round((clickY / img.height) * 100);
 
-      const containerRect = document.getElementById("imageContainer").getBoundingClientRect();
-      const offsetX = clickX - 25;
+      const offsetX = clickX - 25; // centrar o círculo 50px
       const offsetY = clickY - 25;
 
       marker.style.left = `${offsetX}px`;
@@ -213,6 +219,7 @@
     document.getElementById("submitButton").addEventListener("click", function () {
       let missingFields = [];
 
+      // validar campos de texto com limites
       Object.entries(fields).forEach(([key, field]) => {
         const max = charLimits[key];
         const isEmpty = !field.value.trim();
@@ -232,6 +239,7 @@
       });
 
       const imageUrl = imageUrlInput.value.trim();
+      const videoUrl = videoUrlInput.value.trim(); // opcional
       const template = templateSelect.value;
 
       if (!imageUrl) {
@@ -253,6 +261,7 @@
         return;
       }
 
+      // construir payload
       const data = {
         title: fields.title.value.trim(),
         subtitle: fields.subtitle.value.trim(),
@@ -262,6 +271,11 @@
         focus_x: focusX,
         focus_y: focusY
       };
+
+      // só incluir video_url se tiver valor
+      if (videoUrl) {
+        data.video_url = videoUrl;
+      }
 
       fetch("https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv", {
         method: "POST",
