@@ -10,15 +10,19 @@
       margin-top: 40px;
     }
 
-    input, select, button {
+    input, select, button, textarea {
       padding: 10px;
       font-size: 16px;
       margin: 10px;
       width: 300px;
     }
 
-    input.error, select.error {
+    input.error, select.error, textarea.error {
       border: 2px solid red;
+    }
+
+    textarea {
+      resize: vertical; /* permitir ajustar altura */
     }
 
     .char-count {
@@ -90,10 +94,10 @@
   <img id="previewTemplate" alt="Pré-visualização do template" />
   <br />
 
-  <input type="text" id="title" placeholder="Título (máx. 40 carateres)" maxlength="40" />
+  <textarea id="title" placeholder="Título (máx. 40 carateres)" maxlength="40" rows="2"></textarea>
   <div id="titleCount" class="char-count">0/40</div>
 
-  <input type="text" id="subtitle" placeholder="Subtítulo (máx. 90 carateres)" maxlength="90" />
+  <textarea id="subtitle" placeholder="Subtítulo (máx. 90 carateres)" maxlength="90" rows="3"></textarea>
   <div id="subtitleCount" class="char-count">0/90</div>
 
   <input type="text" id="cta" placeholder="Call to Action (máx. 25 carateres)" maxlength="25" />
