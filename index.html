@@ -123,6 +123,15 @@
     .toast.show{display:flex}
     .toast .dot{width:10px;height:10px;border-radius:999px;background:var(--success);box-shadow:0 0 12px var(--success)}
     .small{font-size:12px;color:var(--muted)}
+
+    /* Pills de links recentes */
+    .recent-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+    .pill{border:1px solid var(--border);border-radius:9999px;padding:6px 10px;font-size:12px;cursor:pointer;background:transparent}
+    .pill:hover{transform:translateY(-1px)}
+
+    /* Botões inline para pastas/clipboard */
+    .inline-actions{display:flex;gap:8px}
+    .inline-actions button{width:auto}
   </style>
 </head>
 <body class="theme-dark">
@@ -156,6 +165,15 @@
           <div class="small">A pré-visualização atualiza automaticamente.</div>
         </div>
 
+        <!-- Links rápidos para pastas de imagens e vídeos -->
+        <div class="form-row">
+          <label>Pastas de recursos</label>
+          <div class="small">
+            📁 <a href="https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link" target="_blank">Abrir pasta de imagens no Drive</a><br>
+            📁 <a href="https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link" target="_blank">Abrir pasta de vídeos no Drive</a>
+          </div>
+        </div>
+
         <div class="row-2col">
           <div class="form-row">
             <label for="title">Título</label>
@@ -181,14 +199,24 @@
 
         <div class="form-row">
           <label for="imageUrlInput">URL da Imagem</label>
-          <input type="text" id="imageUrlInput" placeholder="Cole aqui o URL da imagem (Drive ou direto)" />
-          <div class="counter"><span>Imagens Drive em /file/d/…/view são convertidas automaticamente.</span></div>
+          <div class="inline-actions">
+            <input type="text" id="imageUrlInput" placeholder="Cole aqui o URL da imagem (Drive ou direto)" />
+            <button type="button" id="btnImgFolder" class="btn-secondary" title="Abrir pasta de imagens">Abrir pasta</button>
+            <button type="button" id="btnImgPaste" class="btn-primary" title="Colar do clipboard">Colar</button>
+          </div>
+          <div class="counter"><span>Imagens Drive em /file/d/…/view são convertidas automaticamente. Também podes carregar a imagem para a pasta e clicar em <em>Colar</em>.</span></div>
+          <div class="recent-pills" id="recentImages"></div>
           <div class="error-msg" id="imgError">A imagem é obrigatória.</div>
         </div>
 
         <div class="form-row">
           <label for="videoUrlInput">URL do Vídeo <span class="hint">(opcional)</span></label>
-          <input type="text" id="videoUrlInput" placeholder="Ex.: https://…" />
+          <div class="inline-actions">
+            <input type="text" id="videoUrlInput" placeholder="Ex.: https://…" />
+            <button type="button" id="btnVidFolder" class="btn-secondary" title="Abrir pasta de vídeos">Abrir pasta</button>
+            <button type="button" id="btnVidPaste" class="btn-primary" title="Colar do clipboard">Colar</button>
+          </div>
+          <div class="recent-pills" id="recentVideos"></div>
         </div>
 
         <div class="actions">
@@ -254,6 +282,69 @@
       });
     })();
 
+    // Helpers
+    function showToast(title,msg,isError=false){
+      const toast = document.getElementById('toast');
+      const dot = toast.querySelector('.dot');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMsg').textContent = msg;
+      dot.style.background = isError ? 'var(--danger)' : 'var(--success)';
+      dot.style.boxShadow = isError ? '0 0 12px var(--danger)' : '0 0 12px var(--success)';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3800);
+    }
+
+    function saveRecent(key, url){
+      const k = `recent-${key}`;
+      const arr = JSON.parse(localStorage.getItem(k) || '[]');
+      const next = [url, ...arr.filter(u => u !== url)].slice(0,5);
+      localStorage.setItem(k, JSON.stringify(next));
+    }
+
+    function renderRecent(key, containerId, targetInputId){
+      const k = `recent-${key}`;
+      const cont = document.getElementById(containerId);
+      if (!cont) return;
+      cont.innerHTML = '';
+      const arr = JSON.parse(localStorage.getItem(k) || '[]');
+      arr.forEach(u => {
+        const b = document.createElement('button');
+        b.className = 'pill';
+        b.type = 'button';
+        b.title = u;
+        b.textContent = u.replace(/^https?:\/\//,'').slice(0,40) + (u.length>40?'…':'');
+        b.addEventListener('click', () => {
+          const inp = document.getElementById(targetInputId);
+          if (inp){ inp.value = u; inp.dispatchEvent(new Event('input')); }
+        });
+        cont.appendChild(b);
+      });
+    }
+
+    // Converte diversos formatos de links Drive em link utilizável
+    function parseDriveUrl(url){
+      // /file/d/ID/view
+      let m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
+      if (m && m[1]) return {id:m[1], type:'file'};
+      // open?id=ID
+      m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (m && m[1]) return {id:m[1], type:'file'};
+      // folders/ID
+      m = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+      if (m && m[1]) return {id:m[1], type:'folder'};
+      return null;
+    }
+
+    function driveThumbnailUrl(id, width=1600){
+      return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
+    }
+
+    function convertGoogleDriveUrl(url){
+      const parsed = parseDriveUrl(url);
+      if (parsed && parsed.type==='file') return driveThumbnailUrl(parsed.id);
+      return url;
+    }
+
     // Elements
     const img = document.getElementById('image');
     const imageUrlInput = document.getElementById('imageUrlInput');
@@ -263,7 +354,6 @@
     const marker = document.getElementById('focusMarker');
     const loadButton = document.getElementById('loadButton');
 
-    // Counters
     const counters = {
       title: document.getElementById('titleCount'),
       subtitle: document.getElementById('subtitleCount'),
@@ -302,14 +392,7 @@
       setCounter(name);
     });
 
-    // Converte links da Drive no formato /file/d/ID/view para thumbnail
-    function convertGoogleDriveUrl(url){
-      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
-      if(match && match[1]){ return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1600`; }
-      return url;
-    }
-
-    // Pré-visualizações dos templates (Drive)
+    // Template previews (Drive -> thumbnail)
     const templatePreviewsRaw = {
       'StannahGuidelines':'https://drive.google.com/file/d/1G9oWyGbD2c9oUwmGmI-SUYYTm2RuIldW/view?usp=sharing',
       'NewLookV2':'https://drive.google.com/file/d/1jR5Upc8gsuzTV2ykx9qDYNAaXjksVhOo/view?usp=drive_link',
@@ -328,6 +411,40 @@
       }
     });
 
+    // Pasta links
+    const IMG_FOLDER = 'https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link';
+    const VID_FOLDER = 'https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link';
+
+    document.getElementById('btnImgFolder').addEventListener('click', () => window.open(IMG_FOLDER, '_blank'));
+    document.getElementById('btnVidFolder').addEventListener('click', () => window.open(VID_FOLDER, '_blank'));
+
+    async function fillFromClipboard(targetInput){
+      try{
+        const text = await navigator.clipboard.readText();
+        if(!text){ showToast('Clipboard vazio','Copia primeiro o link do Drive.', true); return; }
+        const cleaned = text.trim();
+        // Converter se for ficheiro Drive
+        const maybe = parseDriveUrl(cleaned);
+        const finalUrl = (maybe && maybe.type==='file') ? convertGoogleDriveUrl(cleaned) : cleaned;
+        targetInput.value = finalUrl;
+        targetInput.dispatchEvent(new Event('input'));
+        // Guardar em recentes
+        const key = (targetInput.id === 'imageUrlInput') ? 'images' : 'videos';
+        saveRecent(key, finalUrl);
+        renderRecent(key, key==='images'?'recentImages':'recentVideos', targetInput.id);
+        showToast('Link colado', 'O URL foi preenchido com sucesso.');
+      }catch(err){
+        showToast('Sem acesso ao clipboard','Permite o acesso ao clipboard no navegador ou cola manualmente.', true);
+      }
+    }
+
+    document.getElementById('btnImgPaste').addEventListener('click', () => fillFromClipboard(imageUrlInput));
+    document.getElementById('btnVidPaste').addEventListener('click', () => fillFromClipboard(videoUrlInput));
+
+    // Render iniciais dos recentes
+    renderRecent('images','recentImages','imageUrlInput');
+    renderRecent('videos','recentVideos','videoUrlInput');
+
     function loadImage(){
       const rawUrl = imageUrlInput.value.trim();
       if(!rawUrl){
@@ -344,7 +461,7 @@
       imageUrlInput.classList.remove('error');
     }
 
-    loadButton.addEventListener('click', loadImage);
+    document.getElementById('loadButton').addEventListener('click', loadImage);
 
     // Click para definir ponto focal
     img.addEventListener('click', function(e){
@@ -385,17 +502,6 @@
       return missing;
     }
 
-    function showToast(title,msg,isError=false){
-      const toast = document.getElementById('toast');
-      const dot = toast.querySelector('.dot');
-      document.getElementById('toastTitle').textContent = title;
-      document.getElementById('toastMsg').textContent = msg;
-      dot.style.background = isError ? 'var(--danger)' : 'var(--success)';
-      dot.style.boxShadow = isError ? '0 0 12px var(--danger)' : '0 0 12px var(--success)';
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3800);
-    }
-
     document.getElementById('submitButton').addEventListener('click', function(){
       const missingFields = validate();
       if (missingFields.length > 0){
@@ -418,7 +524,12 @@
       fetch('https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv', {
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
       }).catch(()=>{});
+      // Guardar os dois últimos links usados
+      if (imageUrl) saveRecent('images', imageUrl);
+      if (videoUrl) saveRecent('videos', videoUrl);
       showToast('Enviado', `Dados enviados com sucesso! X: ${focusX}% · Y: ${focusY}%`);
+      renderRecent('images','recentImages','imageUrlInput');
+      renderRecent('videos','recentVideos','videoUrlInput');
     });
   </script>
 </body>
