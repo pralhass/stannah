@@ -129,7 +129,7 @@
     .pill{border:1px solid var(--border);border-radius:9999px;padding:6px 10px;font-size:12px;cursor:pointer;background:transparent}
     .pill:hover{transform:translateY(-1px)}
 
-    /* Botões inline para pastas/clipboard */
+    /* Botões inline para pastas */
     .inline-actions{display:flex;gap:8px}
     .inline-actions button{width:auto}
   </style>
@@ -195,20 +195,12 @@
         </div>
 
         <div class="form-row">
-          <label for="subtitle">Subtítulo</label>
-          <textarea id="subtitle" placeholder="Subtítulo (máx. 90 carateres)" maxlength="90" rows="3"></textarea>
-          <div class="counter" id="subtitleCount"><span>Podes usar 1–3 linhas.</span><strong>0/90</strong></div>
-          <div class="error-msg" id="subtitleError">O subtítulo é obrigatório e não pode exceder 90 caracteres.</div>
-        </div>
-
-        <div class="form-row">
           <label for="imageUrlInput">URL da Imagem</label>
           <div class="inline-actions">
-            <input type="text" id="imageUrlInput" placeholder="Cole aqui o URL da imagem (Drive ou direto)" />
+            <input type="text" id="imageUrlInput" placeholder="URL da imagem (Drive ou direto)" />
             <button type="button" id="btnImgFolder" class="btn-secondary" title="Abrir pasta de imagens">Abrir pasta</button>
-            <button type="button" id="btnImgPaste" class="btn-primary" title="Colar do clipboard">Colar</button>
           </div>
-          <div class="counter"><span>Imagens Drive em /file/d/…/view são convertidas automaticamente. Também podes carregar a imagem para a pasta e clicar em <em>Colar</em>.</span></div>
+          <div class="counter"><span>Links Drive em /file/d/…/view são convertidos automaticamente. Também podes carregar a imagem para a pasta.</span></div>
           <div class="recent-pills" id="recentImages"></div>
           <div class="error-msg" id="imgError">A imagem é obrigatória.</div>
         </div>
@@ -218,7 +210,6 @@
           <div class="inline-actions">
             <input type="text" id="videoUrlInput" placeholder="Ex.: https://…" />
             <button type="button" id="btnVidFolder" class="btn-secondary" title="Abrir pasta de vídeos">Abrir pasta</button>
-            <button type="button" id="btnVidPaste" class="btn-primary" title="Colar do clipboard">Colar</button>
           </div>
           <div class="recent-pills" id="recentVideos"></div>
         </div>
@@ -425,29 +416,6 @@
 
     document.getElementById('btnImgFolder').addEventListener('click', () => window.open(IMG_FOLDER, '_blank'));
     document.getElementById('btnVidFolder').addEventListener('click', () => window.open(VID_FOLDER, '_blank'));
-
-    async function fillFromClipboard(targetInput){
-      try{
-        const text = await navigator.clipboard.readText();
-        if(!text){ showToast('Clipboard vazio','Copia primeiro o link do Drive.', true); return; }
-        const cleaned = text.trim();
-        // Converter se for ficheiro Drive
-        const maybe = parseDriveUrl(cleaned);
-        const finalUrl = (maybe && maybe.type==='file') ? convertGoogleDriveUrl(cleaned) : cleaned;
-        targetInput.value = finalUrl;
-        targetInput.dispatchEvent(new Event('input'));
-        // Guardar em recentes
-        const key = (targetInput.id === 'imageUrlInput') ? 'images' : 'videos';
-        saveRecent(key, finalUrl);
-        renderRecent(key, key==='images'?'recentImages':'recentVideos', targetInput.id);
-        showToast('Link colado', 'O URL foi preenchido com sucesso.');
-      }catch(err){
-        showToast('Sem acesso ao clipboard','Permite o acesso ao clipboard no navegador ou cola manualmente.', true);
-      }
-    }
-
-    document.getElementById('btnImgPaste').addEventListener('click', () => fillFromClipboard(imageUrlInput));
-    document.getElementById('btnVidPaste').addEventListener('click', () => fillFromClipboard(videoUrlInput));
 
     // Render iniciais dos recentes
     renderRecent('images','recentImages','imageUrlInput');
