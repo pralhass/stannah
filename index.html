@@ -56,7 +56,6 @@
       color: var(--text);
       transition: background .2s ease, color .2s ease;
     }
-.recent-pills { display: none; }
 
     .wrap{max-width:1200px;margin:0 auto;padding:32px 20px 60px}
     header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
@@ -257,6 +256,11 @@
   </div>
 
   <script>
+    /* ============================================================
+       Config: desligar histórico de links (não guarda nem mostra)
+       ============================================================ */
+    const SHOW_RECENTS = false;
+
     // Theme handling com selector segmentado
     (function(){
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -300,6 +304,7 @@
     }
 
     function saveRecent(key, url){
+      if (!SHOW_RECENTS) return; // não guardar
       const k = `recent-${key}`;
       const arr = JSON.parse(localStorage.getItem(k) || '[]');
       const next = [url, ...arr.filter(u => u !== url)].slice(0,5);
@@ -307,10 +312,14 @@
     }
 
     function renderRecent(key, containerId, targetInputId){
-      const k = `recent-${key}`;
       const cont = document.getElementById(containerId);
       if (!cont) return;
+      if (!SHOW_RECENTS){
+        cont.style.display = 'none'; // esconder bloco completo
+        return;
+      }
       cont.innerHTML = '';
+      const k = `recent-${key}`;
       const arr = JSON.parse(localStorage.getItem(k) || '[]');
       arr.forEach(u => {
         const b = document.createElement('button');
@@ -437,7 +446,7 @@
         const finalUrl = (maybe && maybe.type==='file') ? convertGoogleDriveUrl(cleaned) : cleaned;
         targetInput.value = finalUrl;
         targetInput.dispatchEvent(new Event('input'));
-        // Guardar em recentes
+        // Guardar em recentes (respeita SHOW_RECENTS)
         const key = (targetInput.id === 'imageUrlInput') ? 'images' : 'videos';
         saveRecent(key, finalUrl);
         renderRecent(key, key==='images'?'recentImages':'recentVideos', targetInput.id);
@@ -450,7 +459,7 @@
     document.getElementById('btnImgPaste').addEventListener('click', () => fillFromClipboard(imageUrlInput));
     document.getElementById('btnVidPaste').addEventListener('click', () => fillFromClipboard(videoUrlInput));
 
-    // Render iniciais dos recentes
+    // Render iniciais dos recentes (serão ignoradas/ocultadas se SHOW_RECENTS=false)
     renderRecent('images','recentImages','imageUrlInput');
     renderRecent('videos','recentVideos','videoUrlInput');
 
@@ -533,7 +542,7 @@
       fetch('https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv', {
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
       }).catch(()=>{});
-      // Guardar os dois últimos links usados
+      // Guardar os dois últimos links usados (respeita SHOW_RECENTS)
       if (imageUrl) saveRecent('images', imageUrl);
       if (videoUrl) saveRecent('videos', videoUrl);
       showToast('Enviado', `Dados enviados com sucesso! X: ${focusX}% · Y: ${focusY}%`);
