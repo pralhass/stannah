@@ -1,18 +1,158 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <!-- (head permanece igual...) -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Creatomate Ads</title>
+  <!-- Favicon SVG inline (S com moldura) -->
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="%23b30000"/>
+        <stop offset="100%" stop-color="%23ff1a1a"/>
+      </linearGradient>
+    </defs>
+    <rect x="4" y="4" width="56" height="56" rx="8" ry="8" fill="none" stroke="url(%23g)" stroke-width="4"/>
+    <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="800" font-size="36" fill="url(%23g)">S</text>
+  </svg>' />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { /* tokens partilhados */
+      --muted: #64748b;
+      --text: #0f172a;
+      --primary: #4f46e5;
+      --primary-600: #4338ca;
+      --ring: #22d3ee;
+      --success: #16a34a;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --border: #e5e7eb;
+    }
+    .theme-dark {
+      --bg: #0b1020;
+      --card: #11172b;
+      --muted: #94a3b8;
+      --text: #e6edf6;
+      --border: #23304c;
+    }
+    .theme-light {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --muted: #64748b;
+      --text: #0f172a;
+      --border: #e5e7eb;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 1200px at 20% -10%, var(--card) 0%, var(--bg) 55%) fixed;
+      color: var(--text);
+      transition: background .2s ease, color .2s ease;
+    }
+
+    .wrap{max-width:1200px;margin:0 auto;padding:32px 20px 60px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+    .title{display:flex;align-items:center;gap:14px}
+
+    /* Logo S com moldura (estilo Stannah) */
+    .logo{width:44px;height:44px;border-radius:8px;border:2px solid #b30000;display:grid;place-items:center;background:transparent}
+    .logo span{font-weight:800;color:#b30000;font-size:22px;font-family:Arial, sans-serif;line-height:1}
+
+    h1{margin:0;font-size:22px;letter-spacing:.2px}
+    .subtitle{margin:6px 0 0;color:var(--muted);font-size:14px}
+
+    /* Selector de tema (segmentado) */
+    .theme-switch{display:inline-flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;box-shadow:0 8px 20px rgba(2,6,23,.15)}
+    .theme-switch .seg{background:transparent;color:var(--text);border:none;border-radius:8px;padding:8px 10px;font-size:14px;cursor:pointer;transition:background .15s ease, transform .05s ease}
+    .theme-switch .seg:hover{transform:translateY(-1px)}
+    .theme-switch .seg.active,.theme-switch .seg[aria-selected="true"]{background:rgba(79,70,229,.14)}
+    .theme-light .theme-switch .seg.active,.theme-light .theme-switch .seg[aria-selected="true"]{background:rgba(79,70,229,.12)}
+
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+    @media (max-width:960px){.grid{grid-template-columns:1fr}}
+
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0));border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:0 10px 40px rgba(2,6,23,.45), inset 0 1px 0 rgba(255,255,255,.05);backdrop-filter:blur(6px)}
+
+    .form-row{display:grid;gap:12px;margin-bottom:16px}
+    label{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+    .hint{font-size:12px;color:var(--muted)}
+
+    select,input[type="text"],textarea,button{width:100%;padding:12px 14px;font-size:15px;border-radius:12px;border:1px solid var(--border);background:#0e1530;color:var(--text);outline:none;transition:border-color .15s ease, box-shadow .15s ease, transform .02s ease}
+    .theme-light select,.theme-light input[type="text"],.theme-light textarea,.theme-light button{background:#ffffff}
+    select:focus,input[type="text"]:focus,textarea:focus{border-color:var(--ring);box-shadow:0 0 0 4px rgba(34,211,238,.15)}
+    textarea{resize:vertical;min-height:72px}
+
+    .row-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:560px){.row-2col{grid-template-columns:1fr}}
+
+    .counter{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
+    .counter strong{font-variant-numeric:tabular-nums}
+    .counter.exceeded{color:var(--danger);font-weight:600}
+
+    .error{border-color:var(--danger)!important}
+    .error-msg{color:var(--danger);font-size:12px;margin-top:6px;display:none}
+    .error + .error-msg{display:block}
+
+    .actions{display:flex;gap:10px;align-items:center;margin-top:8px}
+
+    .btn-primary{background:linear-gradient(180deg,var(--primary),var(--primary-600));border:none;font-weight:700;cursor:pointer;box-shadow:0 10px 25px rgba(79,70,229,.35)}
+    .btn-primary:hover{transform:translateY(-1px)}
+    .btn-secondary{background:#0e1530;border:1px solid var(--border)}
+    .theme-light .btn-secondary{background:#fff}
+
+    .media{display:grid;gap:12px}
+    .preview{border:1px dashed var(--border);border-radius:16px;overflow:hidden;position:relative;background:#0a0f22}
+    .theme-light .preview{background:#f9fafb}
+    .preview .head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px dashed var(--border);color:var(--muted);font-size:12px}
+    .preview img{width:100%;display:block}
+
+    .image-stage{position:relative;display:grid;place-items:center}
+    #image{max-width:100%;display:none;border-radius:0 0 16px 16px}
+    #focusMarker{position:absolute;width:54px;height:54px;border-radius:999px;backdrop-filter:blur(1px);box-shadow:0 0 0 3px rgba(34,211,238,.8),0 0 0 10px rgba(34,211,238,.08);pointer-events:none;display:none;z-index:10;animation:pulse 1.2s infinite ease-in-out}
+    @keyframes pulse{0%{transform:scale(.96);box-shadow:0 0 0 3px rgba(34,211,238,.9),0 0 0 8px rgba(34,211,238,.08)}70%{transform:scale(1);box-shadow:0 0 0 3px rgba(34,211,238,.9),0 0 0 16px rgba(34,211,238,.04)}100%{transform:scale(.96);box-shadow:0 0 0 3px rgba(34,211,238,.9),0 0 0 8px rgba(34,211,238,.08)}}
+
+    .toast{position:fixed;right:18px;bottom:18px;z-index:9999;display:none;align-items:center;gap:12px;background:#0e1530;border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:14px;box-shadow:0 10px 30px rgba(2,6,23,.4);min-width:280px}
+    .theme-light .toast{background:#ffffff}
+    .toast.show{display:flex}
+    .toast .dot{width:10px;height:10px;border-radius:999px;background:var(--success);box-shadow:0 0 12px var(--success)}
+    .small{font-size:12px;color:var(--muted)}
+
+    /* Pills de links recentes */
+    .recent-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+    .pill{border:1px solid var(--border);border-radius:9999px;padding:6px 10px;font-size:12px;cursor:pointer;background:transparent}
+    .pill:hover{transform:translateY(-1px)}
+
+    /* Botões inline para pastas/clipboard */
+    .inline-actions{display:flex;gap:8px}
+    .inline-actions button{width:auto}
+  </style>
 </head>
 <body class="theme-dark">
   <div class="wrap">
     <header>
-      <!-- (header permanece igual...) -->
+      <div class="title">
+        <div class="logo"><span>S</span></div>
+        <div>
+          <h1>Creatomate Ads</h1>
+          <p class="subtitle">Cria e personaliza criativos publicitários facilmente.</p>
+        </div>
+      </div>
+      <div class="theme-switch" role="tablist" aria-label="Tema">
+        <button id="themeLight" class="seg" role="tab" aria-selected="false" title="Tema claro">☀️ Claro</button>
+        <button id="themeDark" class="seg" role="tab" aria-selected="true" title="Tema escuro">🌙 Escuro</button>
+      </div>
     </header>
 
     <div class="grid">
       <!-- Coluna: Formulário -->
       <section class="card">
-        <!-- Template e pastas -->
         <div class="form-row">
           <label for="template">Template</label>
           <select id="template">
@@ -29,6 +169,7 @@
           <div class="small">A pré-visualização atualiza automaticamente.</div>
         </div>
 
+        <!-- Links rápidos para pastas de imagens e vídeos -->
         <div class="form-row">
           <label>Pastas de recursos</label>
           <div class="small">
@@ -63,10 +204,11 @@
         <div class="form-row">
           <label for="imageUrlInput">URL da Imagem</label>
           <div class="inline-actions">
-            <input type="text" id="imageUrlInput" placeholder="URL da imagem (Drive ou direto)" />
+            <input type="text" id="imageUrlInput" placeholder="Cole aqui o URL da imagem (Drive ou direto)" />
             <button type="button" id="btnImgFolder" class="btn-secondary" title="Abrir pasta de imagens">Abrir pasta</button>
+            <button type="button" id="btnImgPaste" class="btn-primary" title="Colar do clipboard">Colar</button>
           </div>
-          <div class="counter"><span>Links Drive em /file/d/…/view são convertidos automaticamente. Também podes carregar a imagem para a pasta.</span></div>
+          <div class="counter"><span>Imagens Drive em /file/d/…/view são convertidas automaticamente. Também podes carregar a imagem para a pasta e clicar em <em>Colar</em>.</span></div>
           <div class="recent-pills" id="recentImages"></div>
           <div class="error-msg" id="imgError">A imagem é obrigatória.</div>
         </div>
@@ -76,6 +218,7 @@
           <div class="inline-actions">
             <input type="text" id="videoUrlInput" placeholder="Ex.: https://…" />
             <button type="button" id="btnVidFolder" class="btn-secondary" title="Abrir pasta de vídeos">Abrir pasta</button>
+            <button type="button" id="btnVidPaste" class="btn-primary" title="Colar do clipboard">Colar</button>
           </div>
           <div class="recent-pills" id="recentVideos"></div>
         </div>
@@ -105,13 +248,296 @@
   </div>
 
   <div class="toast" id="toast">
-    <!-- (toast permanece igual...) -->
+    <div class="dot"></div>
+    <div>
+      <div id="toastTitle" style="font-weight:700;">Sucesso</div>
+      <div id="toastMsg" class="small">Dados enviados.</div>
+    </div>
   </div>
 
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('btnImgFolder').addEventListener('click', () => window.open('https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link', '_blank'));
-      document.getElementById('btnVidFolder').addEventListener('click', () => window.open('https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link', '_blank'));
+    // Theme handling com selector segmentado
+    (function(){
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const saved = localStorage.getItem('ui-theme');
+      const initial = saved || (prefersDark ? 'theme-dark' : 'theme-light');
+
+      function applyTheme(theme){
+        document.body.classList.remove('theme-dark','theme-light');
+        document.body.classList.add(theme);
+        localStorage.setItem('ui-theme', theme);
+        const isDark = theme === 'theme-dark';
+        const btnLight = document.getElementById('themeLight');
+        const btnDark  = document.getElementById('themeDark');
+        if(btnLight&&btnDark){
+          btnLight.classList.toggle('active', !isDark);
+          btnDark.classList.toggle('active',  isDark);
+          btnLight.setAttribute('aria-selected', String(!isDark));
+          btnDark.setAttribute('aria-selected',  String(isDark));
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        applyTheme(initial);
+        const btnLight = document.getElementById('themeLight');
+        const btnDark  = document.getElementById('themeDark');
+        if (btnLight) btnLight.addEventListener('click', () => applyTheme('theme-light'));
+        if (btnDark)  btnDark.addEventListener('click',  () => applyTheme('theme-dark'));
+      });
+    })();
+
+    // Helpers
+    function showToast(title,msg,isError=false){
+      const toast = document.getElementById('toast');
+      const dot = toast.querySelector('.dot');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMsg').textContent = msg;
+      dot.style.background = isError ? 'var(--danger)' : 'var(--success)';
+      dot.style.boxShadow = isError ? '0 0 12px var(--danger)' : '0 0 12px var(--success)';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3800);
+    }
+
+    function saveRecent(key, url){
+      const k = `recent-${key}`;
+      const arr = JSON.parse(localStorage.getItem(k) || '[]');
+      const next = [url, ...arr.filter(u => u !== url)].slice(0,5);
+      localStorage.setItem(k, JSON.stringify(next));
+    }
+
+    function renderRecent(key, containerId, targetInputId){
+      const k = `recent-${key}`;
+      const cont = document.getElementById(containerId);
+      if (!cont) return;
+      cont.innerHTML = '';
+      const arr = JSON.parse(localStorage.getItem(k) || '[]');
+      arr.forEach(u => {
+        const b = document.createElement('button');
+        b.className = 'pill';
+        b.type = 'button';
+        b.title = u;
+        b.textContent = u.replace(/^https?:\/\//,'').slice(0,40) + (u.length>40?'…':'');
+        b.addEventListener('click', () => {
+          const inp = document.getElementById(targetInputId);
+          if (inp){ inp.value = u; inp.dispatchEvent(new Event('input')); }
+        });
+        cont.appendChild(b);
+      });
+    }
+
+    // Converte diversos formatos de links Drive em link utilizável
+    function parseDriveUrl(url){
+      // /file/d/ID/view
+      let m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
+      if (m && m[1]) return {id:m[1], type:'file'};
+      // open?id=ID
+      m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (m && m[1]) return {id:m[1], type:'file'};
+      // folders/ID
+      m = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+      if (m && m[1]) return {id:m[1], type:'folder'};
+      return null;
+    }
+
+    function driveThumbnailUrl(id, width=1600){
+      return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
+    }
+
+    function convertGoogleDriveUrl(url){
+      const parsed = parseDriveUrl(url);
+      if (parsed && parsed.type==='file') return driveThumbnailUrl(parsed.id);
+      return url;
+    }
+
+    // Elements
+    const img = document.getElementById('image');
+    const imageUrlInput = document.getElementById('imageUrlInput');
+    const videoUrlInput = document.getElementById('videoUrlInput'); // opcional
+    const templateSelect = document.getElementById('template');
+    const previewImg = document.getElementById('previewTemplate');
+    const marker = document.getElementById('focusMarker');
+    const loadButton = document.getElementById('loadButton');
+
+    const counters = {
+      title: document.getElementById('titleCount'),
+      subtitle: document.getElementById('subtitleCount'),
+      cta: document.getElementById('ctaCount'),
+    };
+
+    const errors = {
+      title: document.getElementById('titleError'),
+      subtitle: document.getElementById('subtitleError'),
+      cta: document.getElementById('ctaError'),
+      image: document.getElementById('imgError'),
+    };
+
+    const fields = {
+      title: document.getElementById('title'),
+      subtitle: document.getElementById('subtitle'),
+      cta: document.getElementById('cta'),
+    };
+
+    const charLimits = { title: 40, subtitle: 90, cta: 25 };
+
+    let focusX = null;
+    let focusY = null;
+
+    function setCounter(name){
+      const count = fields[name].value.length;
+      const max = charLimits[name];
+      const exceeded = count > max;
+      counters[name].querySelector('strong').textContent = `${count}/${max}`;
+      counters[name].classList.toggle('exceeded', exceeded);
+      fields[name].classList.toggle('error', exceeded || !fields[name].value.trim());
+    }
+
+    Object.keys(fields).forEach(name => {
+      fields[name].addEventListener('input', () => setCounter(name));
+      setCounter(name);
+    });
+
+    // Template previews (Drive -> thumbnail)
+    const templatePreviewsRaw = {
+      'StannahGuidelines':'https://drive.google.com/file/d/1G9oWyGbD2c9oUwmGmI-SUYYTm2RuIldW/view?usp=sharing',
+      'NewLookV2':'https://drive.google.com/file/d/1jR5Upc8gsuzTV2ykx9qDYNAaXjksVhOo/view?usp=drive_link',
+      'NewLookV3':'https://drive.google.com/file/d/1lzNWQFXRwnv0n5GrCfLl284TTLyyF5jM/view?usp=drive_link',
+      'NewLookV4':'https://drive.google.com/file/d/1M6N8GLorcmVOmonXc0sq6nGpiAxMnvHi/view?usp=drive_link',
+      'BrightEngage':'https://drive.google.com/file/d/1GNMLXKrcKWZrbyOz0MAvRhwlYzGJOoYQ/view?usp=drive_link', 
+      'Spot':'https://drive.google.com/file/d/1Cg3gFqZ0kZ39dBaFgd07GuHV_0kEdm5V/view?usp=drive_link',
+      'Grafica':'https://drive.google.com/file/d/1RQ_a0tkbyW8op6HPTINAX-vkWzYKkGG_/view?usp=drive_link',
+      'Ambientata':'https://drive.google.com/file/d/1ilGFEd-C3kv8LZiiHyQw1GaRLoTPSWMc/view?usp=drive_link'
+    };
+
+    templateSelect.addEventListener('change', () => {
+      const selected = templateSelect.value;
+      if (templatePreviewsRaw[selected]){
+        const converted = convertGoogleDriveUrl(templatePreviewsRaw[selected]);
+        previewImg.src = converted;
+        previewImg.style.display = 'block';
+      } else {
+        previewImg.style.display = 'none';
+      }
+    });
+
+    // Pasta links
+    const IMG_FOLDER = 'https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link';
+    const VID_FOLDER = 'https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link';
+
+    document.getElementById('btnImgFolder').addEventListener('click', () => window.open(IMG_FOLDER, '_blank'));
+    document.getElementById('btnVidFolder').addEventListener('click', () => window.open(VID_FOLDER, '_blank'));
+
+    async function fillFromClipboard(targetInput){
+      try{
+        const text = await navigator.clipboard.readText();
+        if(!text){ showToast('Clipboard vazio','Copia primeiro o link do Drive.', true); return; }
+        const cleaned = text.trim();
+        // Converter se for ficheiro Drive
+        const maybe = parseDriveUrl(cleaned);
+        const finalUrl = (maybe && maybe.type==='file') ? convertGoogleDriveUrl(cleaned) : cleaned;
+        targetInput.value = finalUrl;
+        targetInput.dispatchEvent(new Event('input'));
+        // Guardar em recentes
+        const key = (targetInput.id === 'imageUrlInput') ? 'images' : 'videos';
+        saveRecent(key, finalUrl);
+        renderRecent(key, key==='images'?'recentImages':'recentVideos', targetInput.id);
+        showToast('Link colado', 'O URL foi preenchido com sucesso.');
+      }catch(err){
+        showToast('Sem acesso ao clipboard','Permite o acesso ao clipboard no navegador ou cola manualmente.', true);
+      }
+    }
+
+    document.getElementById('btnImgPaste').addEventListener('click', () => fillFromClipboard(imageUrlInput));
+    document.getElementById('btnVidPaste').addEventListener('click', () => fillFromClipboard(videoUrlInput));
+
+    // Render iniciais dos recentes
+    renderRecent('images','recentImages','imageUrlInput');
+    renderRecent('videos','recentVideos','videoUrlInput');
+
+    function loadImage(){
+      const rawUrl = imageUrlInput.value.trim();
+      if(!rawUrl){
+        imageUrlInput.classList.add('error');
+        errors.image.style.display = 'block';
+        return;
+      }
+      const url = convertGoogleDriveUrl(rawUrl);
+      img.src = url;
+      img.style.display = 'block';
+      marker.style.display = 'none';
+      focusX = null; focusY = null;
+      errors.image.style.display = 'none';
+      imageUrlInput.classList.remove('error');
+    }
+
+    document.getElementById('loadButton').addEventListener('click', loadImage);
+
+    // Click para definir ponto focal
+    img.addEventListener('click', function(e){
+      const rect = img.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      focusX = Math.round((clickX / img.width) * 100);
+      focusY = Math.round((clickY / img.height) * 100);
+      const offsetX = clickX - 27; // centrar 54px
+      const offsetY = clickY - 27;
+      marker.style.left = `${offsetX}px`;
+      marker.style.top  = `${offsetY}px`;
+      marker.style.display = 'block';
+    });
+
+    function validate(){
+      const missing = [];
+      ['title','subtitle','cta'].forEach(k => {
+        const v = fields[k].value.trim();
+        const tooLong = v.length > charLimits[k];
+        const empty = !v;
+        const invalid = empty || tooLong;
+        fields[k].classList.toggle('error', invalid);
+        const errKey = k === 'cta' ? 'cta' : k;
+        errors[errKey].style.display = invalid ? 'block' : 'none';
+        if (invalid) missing.push(k === 'title' ? 'Título' : k === 'subtitle' ? 'Subtítulo' : 'Call to Action');
+      });
+      if(!imageUrlInput.value.trim()){
+        imageUrlInput.classList.add('error');
+        errors.image.style.display = 'block';
+        missing.push('URL da Imagem');
+      }
+      if(!templateSelect.value){
+        templateSelect.classList.add('error');
+        missing.push('Template');
+      } else { templateSelect.classList.remove('error'); }
+      if (focusX === null || focusY === null){ missing.push('Selecionar ponto focal na imagem'); }
+      return missing;
+    }
+
+    document.getElementById('submitButton').addEventListener('click', function(){
+      const missingFields = validate();
+      if (missingFields.length > 0){
+        showToast('Faltam campos', `Por favor corrige: ${missingFields.join(', ')}`, true);
+        return;
+      }
+      const imageUrl = imageUrlInput.value.trim();
+      const videoUrl = videoUrlInput.value.trim();
+      const template = templateSelect.value;
+      const data = {
+        title: fields.title.value.trim(),
+        subtitle: fields.subtitle.value.trim(),
+        cta: fields.cta.value.trim(),
+        image_url: imageUrl,
+        template: template,
+        focus_x: focusX,
+        focus_y: focusY
+      };
+      if (videoUrl) data.video_url = videoUrl;
+      fetch('https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
+      }).catch(()=>{});
+      // Guardar os dois últimos links usados
+      if (imageUrl) saveRecent('images', imageUrl);
+      if (videoUrl) saveRecent('videos', videoUrl);
+      showToast('Enviado', `Dados enviados com sucesso! X: ${focusX}% · Y: ${focusY}%`);
+      renderRecent('images','recentImages','imageUrlInput');
+      renderRecent('videos','recentVideos','videoUrlInput');
     });
   </script>
 </body>
