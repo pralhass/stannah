@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Creatomate Ads</title>
-  <!-- Favicon SVG inline (S com moldura) -->
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
   <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
     <defs>
@@ -21,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { /* tokens partilhados */
+    :root {
       --muted: #64748b;
       --text: #0f172a;
       --primary: #4f46e5;
@@ -61,14 +60,12 @@
     header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
     .title{display:flex;align-items:center;gap:14px}
 
-    /* Logo S com moldura (estilo Stannah) */
     .logo{width:44px;height:44px;border-radius:8px;border:2px solid #b30000;display:grid;place-items:center;background:transparent}
     .logo span{font-weight:800;color:#b30000;font-size:22px;font-family:Arial, sans-serif;line-height:1}
 
     h1{margin:0;font-size:22px;letter-spacing:.2px}
     .subtitle{margin:6px 0 0;color:var(--muted);font-size:14px}
 
-    /* Selector de tema (toggle segmentado) */
     .theme-switch{display:inline-flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;box-shadow:0 8px 20px rgba(2,6,23,.15)}
     .theme-switch .seg{background:transparent;color:var(--text);border:none;border-radius:8px;padding:8px 10px;font-size:14px;cursor:pointer;transition:background .15s ease, transform .05s ease}
     .theme-switch .seg:hover{transform:translateY(-1px)}
@@ -88,17 +85,6 @@
     .theme-light select,.theme-light input[type="text"],.theme-light textarea,.theme-light button{background:#ffffff}
     select:focus,input[type="text"]:focus,textarea:focus{border-color:var(--ring);box-shadow:0 0 0 4px rgba(34,211,238,.15)}
     textarea{resize:vertical;min-height:72px}
-
-    .row-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width:560px){.row-2col{grid-template-columns:1fr}}
-
-    .counter{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
-    .counter strong{font-variant-numeric:tabular-nums}
-    .counter.exceeded{color:var(--danger);font-weight:600}
-
-    .error{border-color:var(--danger)!important}
-    .error-msg{color:var(--danger);font-size:12px;margin-top:6px;display:none}
-    .error + .error-msg{display:block}
 
     .actions{display:flex;gap:10px;align-items:center;margin-top:8px}
 
@@ -124,12 +110,10 @@
     .toast .dot{width:10px;height:10px;border-radius:999px;background:var(--success);box-shadow:0 0 12px var(--success)}
     .small{font-size:12px;color:var(--muted)}
 
-    /* Pills de links recentes */
     .recent-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
     .pill{border:1px solid var(--border);border-radius:9999px;padding:6px 10px;font-size:12px;cursor:pointer;background:transparent}
     .pill:hover{transform:translateY(-1px)}
 
-    /* Botões inline para pastas/clipboard */
     .inline-actions{display:flex;gap:8px}
     .inline-actions button{width:auto}
   </style>
@@ -141,7 +125,7 @@
         <div class="logo" aria-hidden="true"><span>S</span></div>
         <div>
           <h1>Creatomate Ads</h1>
-          <p class="subtitle">Cria e personaliza criativos publicitários facilmente.</p>
+          <p class="subtitle">Cria e personaliza criativos publicitários dinamicamente por template.</p>
         </div>
       </div>
       <div class="theme-switch" role="group" aria-label="Tema">
@@ -151,88 +135,24 @@
     </header>
 
     <div class="grid">
-      <!-- Coluna: Formulário -->
       <section class="card" aria-label="Formulário de criação">
         <div class="form-row">
           <label for="template">Template</label>
           <select id="template" required>
-            <option value="">Seleciona um template…</option>
-            <option value="StannahGuidelines">Stannah Guidelines</option>
-            <option value="NewLookV2">New Look V2</option>
-            <option value="NewLookV3">New Look V3</option>
-            <option value="NewLookV4">New Look V4</option>
-            <option value="BrightEngage">Bright Engage</option>
-            <!-- labels amigáveis, values alinhados às chaves -->
-            <option value="Spot">Spot - Dolci</option>
-            <option value="Grafica">Grafica - Dolci</option>
-            <option value="Ambientata">Ambientata - Dolci</option>
-            <option value="FullCleanTemplate">Full Clean Template</option>
-            <option value="Funny">Funny Template</option>
+            <option value="">A carregar templates…</option>
           </select>
-          <div class="small">A pré-visualização atualiza automaticamente.</div>
+          <div class="small">A pré-visualização atualiza automaticamente. Os campos abaixo são gerados a partir do template.</div>
         </div>
 
-        <!-- Links rápidos para pastas de imagens e vídeos -->
-        <div class="form-row">
-          <label>Pastas de recursos</label>
-          <div class="small">
-            📁 <a href="https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link" target="_blank" rel="noopener noreferrer">Abrir pasta de imagens no Drive</a><br>
-            📁 <a href="https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link" target="_blank" rel="noopener noreferrer">Abrir pasta de vídeos no Drive</a>
-          </div>
-        </div>
-
-        <div class="row-2col">
-          <div class="form-row">
-            <label for="title">Título</label>
-            <textarea id="title" placeholder="Título (máx. 40 carateres)" maxlength="40" rows="2" required></textarea>
-            <div class="counter" id="titleCount"><span>Dica: mantém curto e direto.</span><strong>0/40</strong></div>
-            <div class="error-msg" id="titleError">O título é obrigatório e não pode exceder 40 caracteres.</div>
-          </div>
-
-          <div class="form-row">
-            <label for="cta">Call to Action</label>
-            <input type="text" id="cta" placeholder="CTA (máx. 25 carateres)" maxlength="25" required />
-            <div class="counter" id="ctaCount"><span>Ex.: Saber mais</span><strong>0/25</strong></div>
-            <div class="error-msg" id="ctaError">A CTA é obrigatória e não pode exceder 25 caracteres.</div>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <label for="subtitle">Subtítulo</label>
-          <textarea id="subtitle" placeholder="Subtítulo (máx. 90 carateres)" maxlength="90" rows="3" required></textarea>
-          <div class="counter" id="subtitleCount"><span>Podes usar 1–3 linhas.</span><strong>0/90</strong></div>
-          <div class="error-msg" id="subtitleError">O subtítulo é obrigatório e não pode exceder 90 caracteres.</div>
-        </div>
-
-        <div class="form-row">
-          <label for="imageUrlInput">URL da Imagem</label>
-          <div class="inline-actions">
-            <input type="text" id="imageUrlInput" placeholder="Cole aqui o URL da imagem (Drive ou direto)" required />
-            <button type="button" id="btnImgFolder" class="btn-secondary" title="Abrir pasta de imagens" aria-label="Abrir pasta de imagens">Abrir pasta</button>
-            <button type="button" id="btnImgPaste" class="btn-primary" title="Colar do clipboard" aria-label="Colar link da imagem">Colar</button>
-          </div>
-          <div class="counter"><span>Imagens Drive em /file/d/…/view são convertidas automaticamente. Depois de carregar, <strong>clica na imagem para definir o ponto focal</strong>.</span></div>
-          <div class="recent-pills" id="recentImages"></div>
-          <div class="error-msg" id="imgError">A imagem é obrigatória.</div>
-        </div>
-
-        <div class="form-row">
-          <label for="videoUrlInput">URL do Vídeo <span class="hint">(opcional)</span></label>
-          <div class="inline-actions">
-            <input type="text" id="videoUrlInput" placeholder="Ex.: https://…" />
-            <button type="button" id="btnVidFolder" class="btn-secondary" title="Abrir pasta de vídeos" aria-label="Abrir pasta de vídeos">Abrir pasta</button>
-            <button type="button" id="btnVidPaste" class="btn-primary" title="Colar do clipboard" aria-label="Colar link de vídeo">Colar</button>
-          </div>
-          <div class="recent-pills" id="recentVideos"></div>
-        </div>
+        <!-- Host do formulário dinâmico -->
+        <div id="dynamicForm"></div>
 
         <div class="actions">
-          <button class="btn-secondary" id="loadButton" type="button" aria-label="Carregar imagem">Carregar imagem</button>
+          <button class="btn-secondary" id="loadImageBtn" type="button" aria-label="Carregar imagem">Carregar imagem</button>
           <button class="btn-primary" id="submitButton" type="button" aria-label="Enviar dados">Enviar</button>
         </div>
       </section>
 
-      <!-- Coluna: Pré-visualizações -->
       <section class="media" aria-label="Pré-visualizações">
         <div class="preview card">
           <div class="head">Pré-visualização do template <span class="small">(auto)</span></div>
@@ -258,13 +178,20 @@
     </div>
   </div>
 
-  <script defer>
-    /* ============================================================
-       Config: desligar histórico de links (não guarda nem mostra)
-       ============================================================ */
-    const SHOW_RECENTS = false;
+  <script>
+    /* =========================
+       CONFIGURAÇÃO EXTERNA
+       ========================= */
+    // 1) GitHub RAW (recomendado). Substitui pelos teus dados REAIS:
+    const GITHUB_TPL_URL = "https://raw.githubusercontent.com/pralhass/stannah/main/templates.json";
 
-    // Theme handling com toggle segmentado (acessível)
+    // 2) Fallback Google Drive (opcional): coloca o fileId de um templates.json público
+    const DRIVE_FILE_ID = "https://drive.google.com/file/d/1KFX4UCPWOv71ydHjaenPTXn8HSSfIMlx/view?usp=sharing"; // ex.: "1AbC..."
+    const SHOW_RECENTS = false; // histórico local de links (off)
+
+    /* =========================
+       THEME
+       ========================= */
     (function(){
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       const saved = localStorage.getItem('ui-theme');
@@ -284,24 +211,16 @@
           btnDark.setAttribute('aria-pressed',  String(isDark));
         }
       }
-
       window.addEventListener('DOMContentLoaded', () => {
         applyTheme(initial);
-        const btnLight = document.getElementById('themeLight');
-        const btnDark  = document.getElementById('themeDark');
-        if (btnLight) btnLight.addEventListener('click', () => applyTheme('theme-light'));
-        if (btnDark)  btnDark.addEventListener('click',  () => applyTheme('theme-dark'));
-        // teclas seta para alternar
-        document.querySelector('.theme-switch')?.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            const isDark = document.body.classList.contains('theme-dark');
-            applyTheme(isDark ? 'theme-light' : 'theme-dark');
-          }
-        });
+        document.getElementById('themeLight')?.addEventListener('click', () => applyTheme('theme-light'));
+        document.getElementById('themeDark')?.addEventListener('click',  () => applyTheme('theme-dark'));
       });
     })();
 
-    // Helpers
+    /* =========================
+       TOAST + UTILS
+       ========================= */
     function showToast(title,msg,isError=false){
       const toast = document.getElementById('toast');
       const dot = toast.querySelector('.dot');
@@ -313,197 +232,195 @@
       setTimeout(() => toast.classList.remove('show'), 3800);
     }
 
-    function saveRecent(key, url){
-      if (!SHOW_RECENTS) return; // não guardar
-      const k = `recent-${key}`;
-      const arr = JSON.parse(localStorage.getItem(k) || '[]');
-      const next = [url, ...arr.filter(u => u !== url)].slice(0,5);
-      localStorage.setItem(k, JSON.stringify(next));
-    }
-
-    function renderRecent(key, containerId, targetInputId){
-      const cont = document.getElementById(containerId);
-      if (!cont) return;
-      if (!SHOW_RECENTS){
-        cont.style.display = 'none'; // esconder bloco completo
-        return;
-      }
-      cont.innerHTML = '';
-      const k = `recent-${key}`;
-      const arr = JSON.parse(localStorage.getItem(k) || '[]');
-      arr.forEach(u => {
-        const b = document.createElement('button');
-        b.className = 'pill';
-        b.type = 'button';
-        b.title = u;
-        b.textContent = u.replace(/^https?:\/\//,'').slice(0,40) + (u.length>40?'…':'');
-        b.addEventListener('click', () => {
-          const inp = document.getElementById(targetInputId);
-          if (inp){ inp.value = u; inp.dispatchEvent(new Event('input')); }
-        });
-        cont.appendChild(b);
-      });
-    }
-
-    // Converte diversos formatos de links Drive em link utilizável
     function parseDriveUrl(url){
-      // /file/d/ID/view
       let m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
       if (m && m[1]) return {id:m[1], type:'file'};
-      // open?id=ID
       m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
       if (m && m[1]) return {id:m[1], type:'file'};
-      // folders/ID
       m = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
       if (m && m[1]) return {id:m[1], type:'folder'};
       return null;
     }
+    function driveThumbnailUrl(id, width=1600){ return \`https://drive.google.com/thumbnail?id=\${id}&sz=w\${width}\`; }
+    function convertGoogleDriveUrl(url){ const p = parseDriveUrl(url); return (p && p.type==='file') ? driveThumbnailUrl(p.id) : url; }
+    function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r=Math.random()*16|0, v=c==='x'?r:(r&0x3|0x8); return v.toString(16); }); }
 
-    function driveThumbnailUrl(id, width=1600){
-      return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
+    /* =========================
+       LOADER DE TEMPLATES
+       ========================= */
+    async function loadFromGitHub(){
+      if (!GITHUB_TPL_URL || GITHUB_TPL_URL.includes("<repo>")) throw new Error("URL GitHub não configurado");
+      const res = await fetch(GITHUB_TPL_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error("Falha GitHub");
+      const json = await res.json();
+      if (!json || !json.templates) throw new Error("Formato inválido em templates.json");
+      return json.templates;
+    }
+    async function loadFromDrive(){
+      if (!DRIVE_FILE_ID) throw new Error("Drive FILE_ID vazio");
+      const url = \`https://drive.google.com/uc?export=download&id=\${DRIVE_FILE_ID}\`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("Falha Drive");
+      const json = await res.json();
+      if (!json || !json.templates) throw new Error("Formato inválido em templates.json (Drive)");
+      return json.templates;
+    }
+    async function loadTemplates(){
+      try { return await loadFromGitHub(); }
+      catch(e1){
+        console.warn("GitHub falhou:", e1.message);
+        try { return await loadFromDrive(); }
+        catch(e2){
+          console.error("Drive falhou:", e2.message);
+          showToast("Erro", "Não foi possível carregar templates.json", true);
+          return {};
+        }
+      }
     }
 
-    function convertGoogleDriveUrl(url){
-      const parsed = parseDriveUrl(url);
-      if (parsed && parsed.type==='file') return driveThumbnailUrl(parsed.id);
-      return url;
-    }
-
-    // Elements
-    const img = document.getElementById('image');
-    const imageUrlInput = document.getElementById('imageUrlInput');
-    const videoUrlInput = document.getElementById('videoUrlInput'); // opcional
+    /* =========================
+       UI DINÂMICA
+       ========================= */
     const templateSelect = document.getElementById('template');
     const previewImg = document.getElementById('previewTemplate');
+    const formHost = document.getElementById('dynamicForm');
+
+    function mountTemplateSelect(selectEl, registry){
+      selectEl.innerHTML = '<option value="">Seleciona um template…</option>';
+      Object.entries(registry).forEach(([key, tpl]) => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = tpl.label || key;
+        selectEl.appendChild(opt);
+      });
+    }
+
+    function createFieldControl(field){
+      const row = document.createElement('div');
+      row.className = 'form-row';
+      row.dataset.fieldId = field.id;
+
+      const label = document.createElement('label');
+      label.htmlFor = field.id;
+      label.textContent = field.label || field.id;
+      row.appendChild(label);
+
+      let input;
+      switch(field.type){
+        case 'textarea': input = document.createElement('textarea'); input.rows = 3; break;
+        case 'select':
+          input = document.createElement('select');
+          (field.options || []).forEach(opt => {
+            const o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; input.appendChild(o);
+          });
+          break;
+        case 'switch':
+          input = document.createElement('input'); input.type = 'checkbox'; break;
+        default:
+          input = document.createElement('input'); input.type = field.type || 'text';
+      }
+      input.id = field.id; input.name = field.id;
+      if (field.placeholder) input.placeholder = field.placeholder;
+      if (field.required) input.required = true;
+      if (field.maxLength && input.tagName !== 'SELECT' && input.type !== 'checkbox') input.maxLength = field.maxLength;
+
+      row.appendChild(input);
+
+      if (field.help || field.maxLength){
+        const meta = document.createElement('div');
+        meta.className = 'counter';
+        meta.innerHTML = \`<span>\${field.help || ''}</span><strong>\${field.maxLength ? \`0/\${field.maxLength}\` : ''}</strong>\`;
+        row.appendChild(meta);
+        if (field.maxLength){
+          input.addEventListener('input', () => {
+            meta.querySelector('strong').textContent = \`\${(input.value || '').length}/\${field.maxLength}\`;
+          });
+        }
+      }
+
+      const err = document.createElement('div');
+      err.className = 'error-msg'; err.style.display = 'none';
+      err.textContent = 'Campo inválido ou obrigatório.';
+      row.appendChild(err);
+
+      row.dataset.visibleIf = field.visibleIf ? JSON.stringify(field.visibleIf) : '';
+
+      return row;
+    }
+
+    function applyVisibility(container){
+      const values = Object.fromEntries([...container.querySelectorAll('[name]')].map(el => [el.name, (el.type === 'checkbox') ? el.checked : el.value]));
+      [...container.querySelectorAll('.form-row[data-visible-if]')].forEach(row => {
+        const cfg = row.dataset.visibleIf ? JSON.parse(row.dataset.visibleIf) : null;
+        if (!cfg) return row.style.removeProperty('display');
+        const cur = values[cfg.field];
+        const visible = ('equals' in cfg) ? cur == cfg.equals : true;
+        row.style.display = visible ? '' : 'none';
+      });
+    }
+
+    function mountDynamicFormFor(registry, templateKey){
+      formHost.innerHTML = '';
+      if (!templateKey){ previewImg.style.display = 'none'; return; }
+      const tpl = registry[templateKey]; if (!tpl) return;
+      if (tpl.previewUrl){ previewImg.src = convertGoogleDriveUrl(tpl.previewUrl); previewImg.style.display = 'block'; }
+
+      tpl.fields.forEach(f => formHost.appendChild(createFieldControl(f)));
+      formHost.addEventListener('input', () => applyVisibility(formHost), { once: true });
+      applyVisibility(formHost);
+    }
+
+    function validateAndBuildPayload(registry, templateKey){
+      const tpl = registry[templateKey]; if (!tpl) return { ok:false, errors:['Template inválido'] };
+      const errors = []; const data = {};
+      tpl.fields.forEach(f => {
+        const el = formHost.querySelector(\`[name="\${f.id}"]\`);
+        if (!el) return;
+        const row = el.closest('.form-row');
+        if (row && row.style.display === 'none') return; // ignorar escondidos
+        const val = (el.type === 'checkbox') ? el.checked : (el.value || '').trim();
+
+        if (f.required && (val === '' || val === false)){
+          errors.push(f.label || f.id);
+          el.classList.add('error'); row?.querySelector('.error-msg')?.style.setProperty('display','block');
+        } else { el.classList.remove('error'); row?.querySelector('.error-msg')?.style.removeProperty('display'); }
+
+        if (f.maxLength && typeof val === 'string' && val.length > f.maxLength){
+          errors.push(\`\${f.label || f.id} excede \${f.maxLength}\`);
+          el.classList.add('error'); row?.querySelector('.error-msg')?.style.setProperty('display','block');
+        }
+        data[f.id] = val;
+      });
+      if (errors.length) return { ok:false, errors };
+
+      const mapped = {}; const map = tpl.submitMap || {};
+      Object.keys(data).forEach(k => { mapped[map[k] || k] = data[k]; });
+      return { ok:true, payload: mapped };
+    }
+
+    /* =========================
+       IMAGEM & PONTO FOCAL
+       ========================= */
+    const img = document.getElementById('image');
     const marker = document.getElementById('focusMarker');
-    const loadButton = document.getElementById('loadButton');
+    const loadBtn = document.getElementById('loadImageBtn');
+    let focusX = null, focusY = null;
 
-    const counters = {
-      title: document.getElementById('titleCount'),
-      subtitle: document.getElementById('subtitleCount'),
-      cta: document.getElementById('ctaCount'),
-    };
-
-    const errors = {
-      title: document.getElementById('titleError'),
-      subtitle: document.getElementById('subtitleError'),
-      cta: document.getElementById('ctaError'),
-      image: document.getElementById('imgError'),
-    };
-
-    const fields = {
-      title: document.getElementById('title'),
-      subtitle: document.getElementById('subtitle'),
-      cta: document.getElementById('cta'),
-    };
-
-    const charLimits = { title: 40, subtitle: 90, cta: 25 };
-
-    let focusX = null;
-    let focusY = null;
-
-    // Mostrar contagens sem forçar erro antes de interação
-    const touched = { title:false, subtitle:false, cta:false };
-
-    function setCounter(name){
-      const count = fields[name].value.length;
-      const max = charLimits[name];
-      const exceeded = count > max;
-      counters[name].querySelector('strong').textContent = `${count}/${max}`;
-      counters[name].classList.toggle('exceeded', exceeded);
-      const invalid = exceeded || (touched[name] && !fields[name].value.trim());
-      fields[name].classList.toggle('error', invalid);
-      errors[name].style.display = invalid ? 'block' : 'none';
+    function getImageUrlValue(){
+      // convenciona: campo id = "image_url"
+      const el = formHost.querySelector('#image_url');
+      return el ? (el.value || '').trim() : '';
     }
-
-    Object.keys(fields).forEach(name => {
-      fields[name].addEventListener('input', () => setCounter(name));
-      fields[name].addEventListener('blur', () => { touched[name]=true; setCounter(name); });
-      setCounter(name);
-    });
-
-    // Template previews (Drive -> thumbnail)
-    const templatePreviewsRaw = {
-      'StannahGuidelines':'https://drive.google.com/file/d/1G9oWyGbD2c9oUwmGmI-SUYYTm2RuIldW/view?usp=sharing',
-      'NewLookV2':'https://drive.google.com/file/d/1jR5Upc8gsuzTV2ykx9qDYNAaXjksVhOo/view?usp=drive_link',
-      'NewLookV3':'https://drive.google.com/file/d/1lzNWQFXRwnv0n5GrCfLl284TTLyyF5jM/view?usp=drive_link',
-      'NewLookV4':'https://drive.google.com/file/d/1M6N8GLorcmVOmonXc0sq6nGpiAxMnvHi/view?usp=drive_link',
-      'BrightEngage':'https://drive.google.com/file/d/1GNMLXKrcKWZrbyOz0MAvRhwlYzGJOoYQ/view?usp=drive_link', 
-      'Spot':'https://drive.google.com/file/d/1Cg3gFqZ0kZ39dBaFgd07GuHV_0kEdm5V/view?usp=drive_link',
-      'Grafica':'https://drive.google.com/file/d/1RQ_a0tkbyW8op6HPTINAX-vkWzYKkGG_/view?usp=drive_link',
-      'Ambientata':'https://drive.google.com/file/d/1ilGFEd-C3kv8LZiiHyQw1GaRLoTPSWMc/view?usp=drive_link',
-      'FullCleanTemplate':'https://drive.google.com/file/d/1HfuRavObb4MLEvkpDYuMpMOFnAlH0PM_/view?usp=drive_link',
-      'Funny':'https://drive.google.com/file/d/1cB1U1daha3tA7U2Jk5yYRqmgDd1GpR6G/view?usp=drive_link'
-    };
-
-    templateSelect.addEventListener('change', () => {
-      const selected = templateSelect.value;
-      if (templatePreviewsRaw[selected]){
-        const converted = convertGoogleDriveUrl(templatePreviewsRaw[selected]);
-        previewImg.src = converted;
-        previewImg.style.display = 'block';
-      } else {
-        previewImg.style.display = 'none';
-      }
-    });
-
-    // Pasta links
-    const IMG_FOLDER = 'https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link';
-    const VID_FOLDER = 'https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link';
-
-    document.getElementById('btnImgFolder').addEventListener('click', () => window.open(IMG_FOLDER, '_blank', 'noopener,noreferrer'));
-    document.getElementById('btnVidFolder').addEventListener('click', () => window.open(VID_FOLDER, '_blank', 'noopener,noreferrer'));
-
-    async function fillFromClipboard(targetInput){
-      try{
-        const text = await navigator.clipboard.readText();
-        if(!text){ showToast('Clipboard vazio','Copia primeiro o link do Drive.', true); return; }
-        const cleaned = text.trim();
-        // Converter se for ficheiro Drive
-        const maybe = parseDriveUrl(cleaned);
-        const finalUrl = (maybe && maybe.type==='file') ? convertGoogleDriveUrl(cleaned) : cleaned;
-        targetInput.value = finalUrl;
-        targetInput.dispatchEvent(new Event('input'));
-        // Guardar em recentes (respeita SHOW_RECENTS)
-        const key = (targetInput.id === 'imageUrlInput') ? 'images' : 'videos';
-        saveRecent(key, finalUrl);
-        renderRecent(key, key==='images'?'recentImages':'recentVideos', targetInput.id);
-        showToast('Link colado', 'O URL foi preenchido com sucesso.');
-      }catch(err){
-        showToast('Sem acesso ao clipboard','Permite o acesso ao clipboard no navegador ou cola manualmente.', true);
-      }
-    }
-
-    document.getElementById('btnImgPaste').addEventListener('click', () => fillFromClipboard(imageUrlInput));
-    document.getElementById('btnVidPaste').addEventListener('click', () => fillFromClipboard(videoUrlInput));
-
-    // Render iniciais dos recentes (serão ignoradas/ocultadas se SHOW_RECENTS=false)
-    renderRecent('images','recentImages','imageUrlInput');
-    renderRecent('videos','recentVideos','videoUrlInput');
 
     function loadImage(){
-      const rawUrl = imageUrlInput.value.trim();
-      if(!rawUrl){
-        imageUrlInput.classList.add('error');
-        errors.image.style.display = 'block';
-        return;
-      }
+      const rawUrl = getImageUrlValue();
+      if (!rawUrl){ showToast('Imagem', 'Preenche o campo "URL da Imagem" no formulário.', true); return; }
       const url = convertGoogleDriveUrl(rawUrl);
-      img.src = url;
-      img.style.display = 'block';
-      marker.style.display = 'none';
+      img.src = url; img.style.display = 'block'; marker.style.display = 'none';
       focusX = null; focusY = null;
-      errors.image.style.display = 'none';
-      imageUrlInput.classList.remove('error');
     }
-
-    document.getElementById('loadButton').addEventListener('click', loadImage);
-
-    // Erros de imagem
+    loadBtn.addEventListener('click', loadImage);
     img.onerror = () => { showToast('Erro ao carregar imagem', 'Verifica o link ou permissões no Drive.', true); };
-    previewImg.onerror = () => { previewImg.style.display='none'; };
-
-    // Click para definir ponto focal (corrigido com offset do container)
     img.addEventListener('click', function(e){
       const rectImg  = img.getBoundingClientRect();
       const rectWrap = document.getElementById('imageContainer').getBoundingClientRect();
@@ -511,81 +428,38 @@
       const clickY = e.clientY - rectImg.top;
       focusX = Math.round((clickX / rectImg.width) * 100);
       focusY = Math.round((clickY / rectImg.height) * 100);
-      const offsetX = (rectImg.left - rectWrap.left) + clickX - 27; // centrar 54px
+      const offsetX = (rectImg.left - rectWrap.left) + clickX - 27;
       const offsetY = (rectImg.top  - rectWrap.top)  + clickY - 27;
-      marker.style.left = `${offsetX}px`;
-      marker.style.top  = `${offsetY}px`;
-      marker.style.display = 'block';
+      marker.style.left = \`\${offsetX}px\`; marker.style.top = \`\${offsetY}px\`; marker.style.display = 'block';
     });
 
-    function validate(submitting=false){
-      const missing = [];
-      ['title','subtitle','cta'].forEach(k => {
-        const v = fields[k].value.trim();
-        const tooLong = v.length > charLimits[k];
-        const empty = !v;
-        const invalid = empty || tooLong;
-        if (submitting) { touched[k] = true; }
-        fields[k].classList.toggle('error', invalid && touched[k]);
-        errors[k].style.display = (invalid && touched[k]) ? 'block' : 'none';
-        if (invalid) missing.push(k === 'title' ? 'Título' : k === 'subtitle' ? 'Subtítulo' : 'Call to Action');
-      });
-      if(!imageUrlInput.value.trim()){
-        imageUrlInput.classList.add('error');
-        errors.image.style.display = 'block';
-        missing.push('URL da Imagem');
-      }
-      if(!templateSelect.value){
-        templateSelect.classList.add('error');
-        missing.push('Template');
-      } else { templateSelect.classList.remove('error'); }
-      if (focusX === null || focusY === null){ missing.push('Selecionar ponto focal na imagem'); }
-      return missing;
-    }
+    /* =========================
+       SUBMISSÃO
+       ========================= */
+    const SUBMIT_WEBHOOK = "https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv";
+    document.getElementById('submitButton').addEventListener('click', async () => {
+      const t = templateSelect.value;
+      const res = validateAndBuildPayload(window.__TEMPLATE_REGISTRY__, t);
+      if (!res.ok){ showToast('Faltam campos', \`Por favor corrige: \${res.errors.join(', ')}\`, true); return; }
+      const finalPayload = { idOperacao: uuid(), template: t, ...res.payload };
+      if (focusX !== null && focusY !== null){ finalPayload.focus_x = focusX; finalPayload.focus_y = focusY; }
 
-    // UUID simples para tracking
-    function uuid(){
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
-        return v.toString(16);
-      });
-    }
-
-    document.getElementById('submitButton').addEventListener('click', function(){
-      const missingFields = validate(true);
-      if (missingFields.length > 0){
-        showToast('Faltam campos', `Por favor corrige: ${missingFields.join(', ')}`, true);
-        return;
-      }
-      const imageUrl = imageUrlInput.value.trim();
-      const videoUrl = videoUrlInput.value.trim();
-      const template = templateSelect.value;
-      const data = {
-        idOperacao: uuid(),
-        title: fields.title.value.trim(),
-        subtitle: fields.subtitle.value.trim(),
-        cta: fields.cta.value.trim(),
-        image_url: imageUrl,
-        template: template,
-        focus_x: focusX,
-        focus_y: focusY
-      };
-      if (videoUrl) data.video_url = videoUrl;
-
-      fetch('https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
-      })
-      .then(() => {
-        // Guardar os dois últimos links usados (respeita SHOW_RECENTS)
-        if (imageUrl) saveRecent('images', imageUrl);
-        if (videoUrl) saveRecent('videos', videoUrl);
-        showToast('Enviado', `Dados enviados com sucesso! X: ${focusX}% · Y: ${focusY}%`);
-        renderRecent('images','recentImages','imageUrlInput');
-        renderRecent('videos','recentVideos','videoUrlInput');
-      })
-      .catch(() => {
+      try{
+        await fetch(SUBMIT_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(finalPayload) });
+        showToast('Enviado', 'Dados enviados com sucesso!');
+      }catch(e){
         showToast('Falhou envio', 'Tenta novamente em instantes.', true);
-      });
+      }
+    });
+
+    /* =========================
+       BOOTSTRAP
+       ========================= */
+    window.addEventListener('DOMContentLoaded', async () => {
+      const registry = await loadTemplates();
+      window.__TEMPLATE_REGISTRY__ = registry;
+      mountTemplateSelect(templateSelect, registry);
+      templateSelect.addEventListener('change', () => mountDynamicFormFor(registry, templateSelect.value));
     });
   </script>
 </body>
