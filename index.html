@@ -179,288 +179,296 @@
   </div>
 
   <script>
-    /* =========================
-       CONFIGURAÇÃO EXTERNA
-       ========================= */
-    // 1) GitHub RAW (recomendado). Substitui pelos teus dados REAIS:
-    const GITHUB_TPL_URL = "https://raw.githubusercontent.com/pralhass/stannah/main/templates.json";
+  
+/* =========================
+   CONFIG
+   ========================= */
+const GITHUB_TPL_URL = "https://raw.githubusercontent.com/pralhass/stannah/main/templates.json";
+const DRIVE_FILE_ID = ""; // opcional fallback
+const SUBMIT_WEBHOOK = "https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv";
+const SHOW_RECENTS = false;
 
-    // 2) Fallback Google Drive (opcional): coloca o fileId de um templates.json público
-    const DRIVE_FILE_ID = "https://drive.google.com/file/d/1KFX4UCPWOv71ydHjaenPTXn8HSSfIMlx/view?usp=sharing"; // ex.: "1AbC..."
-    const SHOW_RECENTS = false; // histórico local de links (off)
+/* =========================
+   THEME
+   ========================= */
+(function(){
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const saved = localStorage.getItem('ui-theme');
+  const initial = saved || (prefersDark ? 'theme-dark' : 'theme-light');
+  function applyTheme(theme){
+    document.body.classList.remove('theme-dark','theme-light');
+    document.body.classList.add(theme);
+    localStorage.setItem('ui-theme', theme);
+    const isDark = theme === 'theme-dark';
+    const btnLight = document.getElementById('themeLight');
+    const btnDark  = document.getElementById('themeDark');
+    if(btnLight&&btnDark){
+      btnLight.classList.toggle('active', !isDark);
+      btnDark.classList.toggle('active',  isDark);
+      btnLight.setAttribute('aria-pressed', String(!isDark));
+      btnDark.setAttribute('aria-pressed',  String(isDark));
+    }
+  }
+  window.addEventListener('DOMContentLoaded', () => {
+    applyTheme(initial);
+    document.getElementById('themeLight')?.addEventListener('click', () => applyTheme('theme-light'));
+    document.getElementById('themeDark')?.addEventListener('click',  () => applyTheme('theme-dark'));
+  });
+})();
 
-    /* =========================
-       THEME
-       ========================= */
-    (function(){
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const saved = localStorage.getItem('ui-theme');
-      const initial = saved || (prefersDark ? 'theme-dark' : 'theme-light');
+/* =========================
+   TOAST + UTILS
+   ========================= */
+function showToast(title,msg,isError=false){
+  const toast = document.getElementById('toast');
+  const dot = toast.querySelector('.dot');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  dot.style.background = isError ? 'var(--danger)' : 'var(--success)';
+  dot.style.boxShadow = isError ? '0 0 12px var(--danger)' : '0 0 12px var(--success)';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3800);
+}
 
-      function applyTheme(theme){
-        document.body.classList.remove('theme-dark','theme-light');
-        document.body.classList.add(theme);
-        localStorage.setItem('ui-theme', theme);
-        const isDark = theme === 'theme-dark';
-        const btnLight = document.getElementById('themeLight');
-        const btnDark  = document.getElementById('themeDark');
-        if(btnLight&&btnDark){
-          btnLight.classList.toggle('active', !isDark);
-          btnDark.classList.toggle('active',  isDark);
-          btnLight.setAttribute('aria-pressed', String(!isDark));
-          btnDark.setAttribute('aria-pressed',  String(isDark));
-        }
-      }
-      window.addEventListener('DOMContentLoaded', () => {
-        applyTheme(initial);
-        document.getElementById('themeLight')?.addEventListener('click', () => applyTheme('theme-light'));
-        document.getElementById('themeDark')?.addEventListener('click',  () => applyTheme('theme-dark'));
+function parseDriveUrl(url){
+  let m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
+  if (m && m[1]) return {id:m[1], type:'file'};
+  m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m && m[1]) return {id:m[1], type:'file'};
+  m = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (m && m[1]) return {id:m[1], type:'folder'};
+  return null;
+}
+function driveThumbnailUrl(id, width=1600){ return "https://drive.google.com/thumbnail?id=" + id + "&sz=w" + width; }
+function convertGoogleDriveUrl(url){ const p = parseDriveUrl(url); return (p && p.type==='file') ? driveThumbnailUrl(p.id) : url; }
+function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){ const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8); return v.toString(16); }); }
+
+/* =========================
+   LOADER DE TEMPLATES
+   ========================= */
+async function loadFromGitHub(){
+  const res = await fetch(GITHUB_TPL_URL, { cache: "no-store" });
+  if (!res.ok) throw new Error("GitHub " + res.status);
+  const json = await res.json();
+  // aceita {templates:{...}} ou {...} diretamente
+  if (json && json.templates) return json.templates;
+  return json;
+}
+async function loadFromDrive(){
+  if (!DRIVE_FILE_ID) throw new Error("Drive FILE_ID vazio");
+  const url = "https://drive.google.com/uc?export=download&id=" + DRIVE_FILE_ID;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error("Drive " + res.status);
+  const json = await res.json();
+  if (json && json.templates) return json.templates;
+  return json;
+}
+async function loadTemplates(){
+  try { return await loadFromGitHub(); }
+  catch(e1){
+    console.warn("GitHub falhou:", e1);
+    try { return await loadFromDrive(); }
+    catch(e2){ console.error("Drive falhou:", e2); showToast("Erro","Não foi possível carregar templates.json",true); return {}; }
+  }
+}
+
+/* =========================
+   UI DINÂMICA
+   ========================= */
+const templateSelect = document.getElementById('template');
+const previewImg = document.getElementById('previewTemplate');
+const formHost = document.getElementById('dynamicForm');
+
+function mountTemplateSelect(selectEl, registry){
+  selectEl.innerHTML = '<option value="">Seleciona um template...</option>';
+  Object.keys(registry).forEach(function(key){
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = (registry[key].label || key);
+    selectEl.appendChild(opt);
+  });
+}
+
+// normaliza chaves: maxLength vs maxlength
+function normField(f){
+  if (f && typeof f === 'object' && 'maxlength' in f && !('maxLength' in f)) {
+    f.maxLength = f.maxlength;
+  }
+  return f;
+}
+
+function createFieldControl(field){
+  field = normField(field);
+  const row = document.createElement('div');
+  row.className = 'form-row';
+  row.setAttribute('data-field-id', field.id);
+
+  const label = document.createElement('label');
+  label.setAttribute('for', field.id);
+  label.textContent = field.label || field.id;
+  row.appendChild(label);
+
+  var input;
+  switch(field.type){
+    case 'textarea': input = document.createElement('textarea'); input.rows = 3; break;
+    case 'select':
+      input = document.createElement('select');
+      (field.options || []).forEach(function(opt){
+        var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; input.appendChild(o);
       });
-    })();
+      break;
+    case 'switch': input = document.createElement('input'); input.type = 'checkbox'; break;
+    default: input = document.createElement('input'); input.type = field.type || 'text';
+  }
+  input.id = field.id; input.name = field.id;
+  if (field.placeholder) input.placeholder = field.placeholder;
+  if (field.required) input.required = true;
+  if (field.maxLength && input.tagName !== 'SELECT' && input.type !== 'checkbox') input.maxLength = field.maxLength;
+  row.appendChild(input);
 
-    /* =========================
-       TOAST + UTILS
-       ========================= */
-    function showToast(title,msg,isError=false){
-      const toast = document.getElementById('toast');
-      const dot = toast.querySelector('.dot');
-      document.getElementById('toastTitle').textContent = title;
-      document.getElementById('toastMsg').textContent = msg;
-      dot.style.background = isError ? 'var(--danger)' : 'var(--success)';
-      dot.style.boxShadow = isError ? '0 0 12px var(--danger)' : '0 0 12px var(--success)';
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3800);
-    }
-
-    function parseDriveUrl(url){
-      let m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
-      if (m && m[1]) return {id:m[1], type:'file'};
-      m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if (m && m[1]) return {id:m[1], type:'file'};
-      m = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
-      if (m && m[1]) return {id:m[1], type:'folder'};
-      return null;
-    }
-    function driveThumbnailUrl(id, width=1600){ return \`https://drive.google.com/thumbnail?id=\${id}&sz=w\${width}\`; }
-    function convertGoogleDriveUrl(url){ const p = parseDriveUrl(url); return (p && p.type==='file') ? driveThumbnailUrl(p.id) : url; }
-    function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r=Math.random()*16|0, v=c==='x'?r:(r&0x3|0x8); return v.toString(16); }); }
-
-    /* =========================
-       LOADER DE TEMPLATES
-       ========================= */
-    async function loadFromGitHub(){
-      if (!GITHUB_TPL_URL || GITHUB_TPL_URL.includes("<repo>")) throw new Error("URL GitHub não configurado");
-      const res = await fetch(GITHUB_TPL_URL, { cache: "no-store" });
-      if (!res.ok) throw new Error("Falha GitHub");
-      const json = await res.json();
-      if (!json || !json.templates) throw new Error("Formato inválido em templates.json");
-      return json.templates;
-    }
-    async function loadFromDrive(){
-      if (!DRIVE_FILE_ID) throw new Error("Drive FILE_ID vazio");
-      const url = \`https://drive.google.com/uc?export=download&id=\${DRIVE_FILE_ID}\`;
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) throw new Error("Falha Drive");
-      const json = await res.json();
-      if (!json || !json.templates) throw new Error("Formato inválido em templates.json (Drive)");
-      return json.templates;
-    }
-    async function loadTemplates(){
-      try { return await loadFromGitHub(); }
-      catch(e1){
-        console.warn("GitHub falhou:", e1.message);
-        try { return await loadFromDrive(); }
-        catch(e2){
-          console.error("Drive falhou:", e2.message);
-          showToast("Erro", "Não foi possível carregar templates.json", true);
-          return {};
-        }
-      }
-    }
-
-    /* =========================
-       UI DINÂMICA
-       ========================= */
-    const templateSelect = document.getElementById('template');
-    const previewImg = document.getElementById('previewTemplate');
-    const formHost = document.getElementById('dynamicForm');
-
-    function mountTemplateSelect(selectEl, registry){
-      selectEl.innerHTML = '<option value="">Seleciona um template…</option>';
-      Object.entries(registry).forEach(([key, tpl]) => {
-        const opt = document.createElement('option');
-        opt.value = key;
-        opt.textContent = tpl.label || key;
-        selectEl.appendChild(opt);
-      });
-    }
-
-    function createFieldControl(field){
-      const row = document.createElement('div');
-      row.className = 'form-row';
-      row.dataset.fieldId = field.id;
-
-      const label = document.createElement('label');
-      label.htmlFor = field.id;
-      label.textContent = field.label || field.id;
-      row.appendChild(label);
-
-      let input;
-      switch(field.type){
-        case 'textarea': input = document.createElement('textarea'); input.rows = 3; break;
-        case 'select':
-          input = document.createElement('select');
-          (field.options || []).forEach(opt => {
-            const o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; input.appendChild(o);
-          });
-          break;
-        case 'switch':
-          input = document.createElement('input'); input.type = 'checkbox'; break;
-        default:
-          input = document.createElement('input'); input.type = field.type || 'text';
-      }
-      input.id = field.id; input.name = field.id;
-      if (field.placeholder) input.placeholder = field.placeholder;
-      if (field.required) input.required = true;
-      if (field.maxLength && input.tagName !== 'SELECT' && input.type !== 'checkbox') input.maxLength = field.maxLength;
-
-      row.appendChild(input);
-
-      if (field.help || field.maxLength){
-        const meta = document.createElement('div');
-        meta.className = 'counter';
-        meta.innerHTML = \`<span>\${field.help || ''}</span><strong>\${field.maxLength ? \`0/\${field.maxLength}\` : ''}</strong>\`;
-        row.appendChild(meta);
-        if (field.maxLength){
-          input.addEventListener('input', () => {
-            meta.querySelector('strong').textContent = \`\${(input.value || '').length}/\${field.maxLength}\`;
-          });
-        }
-      }
-
-      const err = document.createElement('div');
-      err.className = 'error-msg'; err.style.display = 'none';
-      err.textContent = 'Campo inválido ou obrigatório.';
-      row.appendChild(err);
-
-      row.dataset.visibleIf = field.visibleIf ? JSON.stringify(field.visibleIf) : '';
-
-      return row;
-    }
-
-    function applyVisibility(container){
-      const values = Object.fromEntries([...container.querySelectorAll('[name]')].map(el => [el.name, (el.type === 'checkbox') ? el.checked : el.value]));
-      [...container.querySelectorAll('.form-row[data-visible-if]')].forEach(row => {
-        const cfg = row.dataset.visibleIf ? JSON.parse(row.dataset.visibleIf) : null;
-        if (!cfg) return row.style.removeProperty('display');
-        const cur = values[cfg.field];
-        const visible = ('equals' in cfg) ? cur == cfg.equals : true;
-        row.style.display = visible ? '' : 'none';
+  if (field.help || field.maxLength){
+    const meta = document.createElement('div');
+    meta.className = 'counter';
+    meta.innerHTML = '<span>' + (field.help || '') + '</span><strong>' + (field.maxLength ? ('0/'+field.maxLength) : '') + '</strong>';
+    row.appendChild(meta);
+    if (field.maxLength){
+      input.addEventListener('input', function(){
+        meta.querySelector('strong').textContent = (input.value || '').length + '/' + field.maxLength;
       });
     }
+  }
 
-    function mountDynamicFormFor(registry, templateKey){
-      formHost.innerHTML = '';
-      if (!templateKey){ previewImg.style.display = 'none'; return; }
-      const tpl = registry[templateKey]; if (!tpl) return;
-      if (tpl.previewUrl){ previewImg.src = convertGoogleDriveUrl(tpl.previewUrl); previewImg.style.display = 'block'; }
+  const err = document.createElement('div');
+  err.className = 'error-msg'; err.style.display = 'none';
+  err.textContent = 'Campo inválido ou obrigatório.';
+  row.appendChild(err);
 
-      tpl.fields.forEach(f => formHost.appendChild(createFieldControl(f)));
-      formHost.addEventListener('input', () => applyVisibility(formHost), { once: true });
-      applyVisibility(formHost);
+  row.setAttribute('data-visible-if', field.visibleIf ? JSON.stringify(field.visibleIf) : '');
+
+  return row;
+}
+
+function applyVisibility(container){
+  const values = {};
+  [].slice.call(container.querySelectorAll('[name]')).forEach(function(el){
+    values[el.name] = (el.type === 'checkbox') ? el.checked : el.value;
+  });
+  [].slice.call(container.querySelectorAll('.form-row[data-visible-if]')).forEach(function(row){
+    const raw = row.getAttribute('data-visible-if');
+    if (!raw) { row.style.removeProperty('display'); return; }
+    var cfg = null; try { cfg = JSON.parse(raw); } catch(e){}
+    if (!cfg) { row.style.removeProperty('display'); return; }
+    const cur = values[cfg.field];
+    const visible = ('equals' in cfg) ? (cur == cfg.equals) : true;
+    row.style.display = visible ? '' : 'none';
+  });
+}
+
+function mountDynamicFormFor(registry, templateKey){
+  formHost.innerHTML = '';
+  if (!templateKey){ previewImg.style.display = 'none'; return; }
+  const tpl = registry[templateKey]; if (!tpl) return;
+  if (tpl.previewUrl){ previewImg.src = convertGoogleDriveUrl(tpl.previewUrl); previewImg.style.display = 'block'; }
+  (tpl.fields || []).forEach(function(f){ formHost.appendChild(createFieldControl(f)); });
+  formHost.addEventListener('input', function(){ applyVisibility(formHost); }, { once: true });
+  applyVisibility(formHost);
+}
+
+function validateAndBuildPayload(registry, templateKey){
+  const tpl = registry[templateKey]; if (!tpl) return { ok:false, errors:['Template inválido'] };
+  const errors = []; const data = {};
+  (tpl.fields || []).forEach(function(f){
+    f = normField(f);
+    const el = formHost.querySelector('[name="'+f.id+'"]'); if (!el) return;
+    const row = el.closest('.form-row');
+    if (row && row.style.display === 'none') return;
+    const val = (el.type === 'checkbox') ? el.checked : (el.value || '').trim();
+
+    if (f.required && (val === '' || val === false)){
+      errors.push(f.label || f.id);
+      el.classList.add('error'); if (row) row.querySelector('.error-msg').style.display = 'block';
+    } else {
+      el.classList.remove('error'); if (row) row.querySelector('.error-msg').style.display = 'none';
     }
-
-    function validateAndBuildPayload(registry, templateKey){
-      const tpl = registry[templateKey]; if (!tpl) return { ok:false, errors:['Template inválido'] };
-      const errors = []; const data = {};
-      tpl.fields.forEach(f => {
-        const el = formHost.querySelector(\`[name="\${f.id}"]\`);
-        if (!el) return;
-        const row = el.closest('.form-row');
-        if (row && row.style.display === 'none') return; // ignorar escondidos
-        const val = (el.type === 'checkbox') ? el.checked : (el.value || '').trim();
-
-        if (f.required && (val === '' || val === false)){
-          errors.push(f.label || f.id);
-          el.classList.add('error'); row?.querySelector('.error-msg')?.style.setProperty('display','block');
-        } else { el.classList.remove('error'); row?.querySelector('.error-msg')?.style.removeProperty('display'); }
-
-        if (f.maxLength && typeof val === 'string' && val.length > f.maxLength){
-          errors.push(\`\${f.label || f.id} excede \${f.maxLength}\`);
-          el.classList.add('error'); row?.querySelector('.error-msg')?.style.setProperty('display','block');
-        }
-        data[f.id] = val;
-      });
-      if (errors.length) return { ok:false, errors };
-
-      const mapped = {}; const map = tpl.submitMap || {};
-      Object.keys(data).forEach(k => { mapped[map[k] || k] = data[k]; });
-      return { ok:true, payload: mapped };
+    if (f.maxLength && typeof val === 'string' && val.length > f.maxLength){
+      errors.push((f.label || f.id) + ' excede ' + f.maxLength);
+      el.classList.add('error'); if (row) row.querySelector('.error-msg').style.display = 'block';
     }
+    data[f.id] = val;
+  });
+  if (errors.length) return { ok:false, errors };
+  const mapped = {}; const map = tpl.submitMap || {};
+  Object.keys(data).forEach(function(k){ mapped[map[k] || k] = data[k]; });
+  return { ok:true, payload: mapped };
+}
 
-    /* =========================
-       IMAGEM & PONTO FOCAL
-       ========================= */
-    const img = document.getElementById('image');
-    const marker = document.getElementById('focusMarker');
-    const loadBtn = document.getElementById('loadImageBtn');
-    let focusX = null, focusY = null;
+/* =========================
+   IMAGEM & PONTO FOCAL
+   ========================= */
+const img = document.getElementById('image');
+const marker = document.getElementById('focusMarker');
+const loadBtn = document.getElementById('loadImageBtn');
+let focusX = null, focusY = null;
 
-    function getImageUrlValue(){
-      // convenciona: campo id = "image_url"
-      const el = formHost.querySelector('#image_url');
-      return el ? (el.value || '').trim() : '';
-    }
+function getImageUrlValue(){
+  const el = formHost.querySelector('#image_url');
+  return el ? (el.value || '').trim() : '';
+}
+function loadImage(){
+  const rawUrl = getImageUrlValue();
+  if (!rawUrl){ showToast('Imagem', 'Preenche o campo "URL da Imagem" no formulário.', true); return; }
+  const url = convertGoogleDriveUrl(rawUrl);
+  img.src = url; img.style.display = 'block'; marker.style.display = 'none';
+  focusX = null; focusY = null;
+}
+loadBtn.addEventListener('click', loadImage);
+img.onerror = function(){ showToast('Erro ao carregar imagem', 'Verifica o link ou permissões no Drive.', true); };
+img.addEventListener('click', function(e){
+  const rectImg  = img.getBoundingClientRect();
+  const rectWrap = document.getElementById('imageContainer').getBoundingClientRect();
+  const clickX = e.clientX - rectImg.left;
+  const clickY = e.clientY - rectImg.top;
+  focusX = Math.round((clickX / rectImg.width) * 100);
+  focusY = Math.round((clickY / rectImg.height) * 100);
+  const offsetX = (rectImg.left - rectWrap.left) + clickX - 27;
+  const offsetY = (rectImg.top  - rectWrap.top)  + clickY - 27;
+  marker.style.left = offsetX + 'px';
+  marker.style.top  = offsetY + 'px';
+  marker.style.display = 'block';
+});
 
-    function loadImage(){
-      const rawUrl = getImageUrlValue();
-      if (!rawUrl){ showToast('Imagem', 'Preenche o campo "URL da Imagem" no formulário.', true); return; }
-      const url = convertGoogleDriveUrl(rawUrl);
-      img.src = url; img.style.display = 'block'; marker.style.display = 'none';
-      focusX = null; focusY = null;
-    }
-    loadBtn.addEventListener('click', loadImage);
-    img.onerror = () => { showToast('Erro ao carregar imagem', 'Verifica o link ou permissões no Drive.', true); };
-    img.addEventListener('click', function(e){
-      const rectImg  = img.getBoundingClientRect();
-      const rectWrap = document.getElementById('imageContainer').getBoundingClientRect();
-      const clickX = e.clientX - rectImg.left;
-      const clickY = e.clientY - rectImg.top;
-      focusX = Math.round((clickX / rectImg.width) * 100);
-      focusY = Math.round((clickY / rectImg.height) * 100);
-      const offsetX = (rectImg.left - rectWrap.left) + clickX - 27;
-      const offsetY = (rectImg.top  - rectWrap.top)  + clickY - 27;
-      marker.style.left = \`\${offsetX}px\`; marker.style.top = \`\${offsetY}px\`; marker.style.display = 'block';
-    });
+/* =========================
+   SUBMISSÃO
+   ========================= */
+document.getElementById('submitButton').addEventListener('click', async function(){
+  const t = templateSelect.value;
+  const res = validateAndBuildPayload(window.__TEMPLATE_REGISTRY__ || {}, t);
+  if (!res.ok){ showToast('Faltam campos', 'Por favor corrige: ' + res.errors.join(', '), true); return; }
+  const finalPayload = { idOperacao: uuid(), template: t, ...res.payload };
+  if (focusX !== null && focusY !== null){ finalPayload.focus_x = focusX; finalPayload.focus_y = focusY; }
+  try{
+    await fetch(SUBMIT_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(finalPayload) });
+    showToast('Enviado', 'Dados enviados com sucesso!');
+  }catch(e){
+    showToast('Falhou envio', 'Tenta novamente em instantes.', true);
+  }
+});
 
-    /* =========================
-       SUBMISSÃO
-       ========================= */
-    const SUBMIT_WEBHOOK = "https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv";
-    document.getElementById('submitButton').addEventListener('click', async () => {
-      const t = templateSelect.value;
-      const res = validateAndBuildPayload(window.__TEMPLATE_REGISTRY__, t);
-      if (!res.ok){ showToast('Faltam campos', \`Por favor corrige: \${res.errors.join(', ')}\`, true); return; }
-      const finalPayload = { idOperacao: uuid(), template: t, ...res.payload };
-      if (focusX !== null && focusY !== null){ finalPayload.focus_x = focusX; finalPayload.focus_y = focusY; }
+/* =========================
+   BOOTSTRAP
+   ========================= */
+window.addEventListener('DOMContentLoaded', async function(){
+  const registry = await loadTemplates();
+  window.__TEMPLATE_REGISTRY__ = registry;
+  mountTemplateSelect(templateSelect, registry);
+  templateSelect.addEventListener('change', function(){
+    mountDynamicFormFor(registry, templateSelect.value);
+  });
+  // Se quiseres pré-selecionar um template:
+  // templateSelect.value = Object.keys(registry)[0] || "";
+  // if (templateSelect.value) mountDynamicFormFor(registry, templateSelect.value);
+});
 
-      try{
-        await fetch(SUBMIT_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(finalPayload) });
-        showToast('Enviado', 'Dados enviados com sucesso!');
-      }catch(e){
-        showToast('Falhou envio', 'Tenta novamente em instantes.', true);
-      }
-    });
-
-    /* =========================
-       BOOTSTRAP
-       ========================= */
-    window.addEventListener('DOMContentLoaded', async () => {
-      const registry = await loadTemplates();
-      window.__TEMPLATE_REGISTRY__ = registry;
-      mountTemplateSelect(templateSelect, registry);
-      templateSelect.addEventListener('change', () => mountDynamicFormFor(registry, templateSelect.value));
-    });
   </script>
 </body>
 </html>
