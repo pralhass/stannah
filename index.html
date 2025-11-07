@@ -68,12 +68,12 @@
     h1{margin:0;font-size:22px;letter-spacing:.2px}
     .subtitle{margin:6px 0 0;color:var(--muted);font-size:14px}
 
-    /* Selector de tema (segmentado) */
+    /* Selector de tema (toggle segmentado) */
     .theme-switch{display:inline-flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;box-shadow:0 8px 20px rgba(2,6,23,.15)}
     .theme-switch .seg{background:transparent;color:var(--text);border:none;border-radius:8px;padding:8px 10px;font-size:14px;cursor:pointer;transition:background .15s ease, transform .05s ease}
     .theme-switch .seg:hover{transform:translateY(-1px)}
-    .theme-switch .seg.active,.theme-switch .seg[aria-selected="true"]{background:rgba(79,70,229,.14)}
-    .theme-light .theme-switch .seg.active,.theme-light .theme-switch .seg[aria-selected="true"]{background:rgba(79,70,229,.12)}
+    .theme-switch .seg.active,[aria-pressed="true"]{background:rgba(79,70,229,.14)}
+    .theme-light .theme-switch .seg.active,.theme-light [aria-pressed="true"]{background:rgba(79,70,229,.12)}
 
     .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
     @media (max-width:960px){.grid{grid-template-columns:1fr}}
@@ -138,35 +138,36 @@
   <div class="wrap">
     <header>
       <div class="title">
-        <div class="logo"><span>S</span></div>
+        <div class="logo" aria-hidden="true"><span>S</span></div>
         <div>
           <h1>Creatomate Ads</h1>
           <p class="subtitle">Cria e personaliza criativos publicitários facilmente.</p>
         </div>
       </div>
-      <div class="theme-switch" role="tablist" aria-label="Tema">
-        <button id="themeLight" class="seg" role="tab" aria-selected="false" title="Tema claro">☀️ Claro</button>
-        <button id="themeDark" class="seg" role="tab" aria-selected="true" title="Tema escuro">🌙 Escuro</button>
+      <div class="theme-switch" role="group" aria-label="Tema">
+        <button id="themeLight" class="seg" aria-pressed="false" title="Tema claro" type="button">☀️ Claro</button>
+        <button id="themeDark" class="seg" aria-pressed="true" title="Tema escuro" type="button">🌙 Escuro</button>
       </div>
     </header>
 
     <div class="grid">
       <!-- Coluna: Formulário -->
-      <section class="card">
+      <section class="card" aria-label="Formulário de criação">
         <div class="form-row">
           <label for="template">Template</label>
-          <select id="template">
+          <select id="template" required>
             <option value="">Seleciona um template…</option>
             <option value="StannahGuidelines">Stannah Guidelines</option>
             <option value="NewLookV2">New Look V2</option>
             <option value="NewLookV3">New Look V3</option>
             <option value="NewLookV4">New Look V4</option>
             <option value="BrightEngage">Bright Engage</option>
+            <!-- labels amigáveis, values alinhados às chaves -->
             <option value="Spot">Spot - Dolci</option>
             <option value="Grafica">Grafica - Dolci</option>
             <option value="Ambientata">Ambientata - Dolci</option>
             <option value="FullCleanTemplate">Full Clean Template</option>
-            <option value="Funy">Funy Template</option>
+            <option value="Funny">Funny Template</option>
           </select>
           <div class="small">A pré-visualização atualiza automaticamente.</div>
         </div>
@@ -175,22 +176,22 @@
         <div class="form-row">
           <label>Pastas de recursos</label>
           <div class="small">
-            📁 <a href="https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link" target="_blank">Abrir pasta de imagens no Drive</a><br>
-            📁 <a href="https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link" target="_blank">Abrir pasta de vídeos no Drive</a>
+            📁 <a href="https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link" target="_blank" rel="noopener noreferrer">Abrir pasta de imagens no Drive</a><br>
+            📁 <a href="https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link" target="_blank" rel="noopener noreferrer">Abrir pasta de vídeos no Drive</a>
           </div>
         </div>
 
         <div class="row-2col">
           <div class="form-row">
             <label for="title">Título</label>
-            <textarea id="title" placeholder="Título (máx. 40 carateres)" maxlength="40" rows="2"></textarea>
+            <textarea id="title" placeholder="Título (máx. 40 carateres)" maxlength="40" rows="2" required></textarea>
             <div class="counter" id="titleCount"><span>Dica: mantém curto e direto.</span><strong>0/40</strong></div>
             <div class="error-msg" id="titleError">O título é obrigatório e não pode exceder 40 caracteres.</div>
           </div>
 
           <div class="form-row">
             <label for="cta">Call to Action</label>
-            <input type="text" id="cta" placeholder="CTA (máx. 25 carateres)" maxlength="25" />
+            <input type="text" id="cta" placeholder="CTA (máx. 25 carateres)" maxlength="25" required />
             <div class="counter" id="ctaCount"><span>Ex.: Saber mais</span><strong>0/25</strong></div>
             <div class="error-msg" id="ctaError">A CTA é obrigatória e não pode exceder 25 caracteres.</div>
           </div>
@@ -198,7 +199,7 @@
 
         <div class="form-row">
           <label for="subtitle">Subtítulo</label>
-          <textarea id="subtitle" placeholder="Subtítulo (máx. 90 carateres)" maxlength="90" rows="3"></textarea>
+          <textarea id="subtitle" placeholder="Subtítulo (máx. 90 carateres)" maxlength="90" rows="3" required></textarea>
           <div class="counter" id="subtitleCount"><span>Podes usar 1–3 linhas.</span><strong>0/90</strong></div>
           <div class="error-msg" id="subtitleError">O subtítulo é obrigatório e não pode exceder 90 caracteres.</div>
         </div>
@@ -206,11 +207,11 @@
         <div class="form-row">
           <label for="imageUrlInput">URL da Imagem</label>
           <div class="inline-actions">
-            <input type="text" id="imageUrlInput" placeholder="Cole aqui o URL da imagem (Drive ou direto)" />
-            <button type="button" id="btnImgFolder" class="btn-secondary" title="Abrir pasta de imagens">Abrir pasta</button>
-            <button type="button" id="btnImgPaste" class="btn-primary" title="Colar do clipboard">Colar</button>
+            <input type="text" id="imageUrlInput" placeholder="Cole aqui o URL da imagem (Drive ou direto)" required />
+            <button type="button" id="btnImgFolder" class="btn-secondary" title="Abrir pasta de imagens" aria-label="Abrir pasta de imagens">Abrir pasta</button>
+            <button type="button" id="btnImgPaste" class="btn-primary" title="Colar do clipboard" aria-label="Colar link da imagem">Colar</button>
           </div>
-          <div class="counter"><span>Imagens Drive em /file/d/…/view são convertidas automaticamente. Também podes carregar a imagem para a pasta e clicar em <em>Colar</em>.</span></div>
+          <div class="counter"><span>Imagens Drive em /file/d/…/view são convertidas automaticamente. Depois de carregar, <strong>clica na imagem para definir o ponto focal</strong>.</span></div>
           <div class="recent-pills" id="recentImages"></div>
           <div class="error-msg" id="imgError">A imagem é obrigatória.</div>
         </div>
@@ -219,51 +220,51 @@
           <label for="videoUrlInput">URL do Vídeo <span class="hint">(opcional)</span></label>
           <div class="inline-actions">
             <input type="text" id="videoUrlInput" placeholder="Ex.: https://…" />
-            <button type="button" id="btnVidFolder" class="btn-secondary" title="Abrir pasta de vídeos">Abrir pasta</button>
-            <button type="button" id="btnVidPaste" class="btn-primary" title="Colar do clipboard">Colar</button>
+            <button type="button" id="btnVidFolder" class="btn-secondary" title="Abrir pasta de vídeos" aria-label="Abrir pasta de vídeos">Abrir pasta</button>
+            <button type="button" id="btnVidPaste" class="btn-primary" title="Colar do clipboard" aria-label="Colar link de vídeo">Colar</button>
           </div>
           <div class="recent-pills" id="recentVideos"></div>
         </div>
 
         <div class="actions">
-          <button class="btn-secondary" id="loadButton" type="button">Carregar imagem</button>
-          <button class="btn-primary" id="submitButton" type="button">Enviar</button>
+          <button class="btn-secondary" id="loadButton" type="button" aria-label="Carregar imagem">Carregar imagem</button>
+          <button class="btn-primary" id="submitButton" type="button" aria-label="Enviar dados">Enviar</button>
         </div>
       </section>
 
       <!-- Coluna: Pré-visualizações -->
-      <section class="media">
+      <section class="media" aria-label="Pré-visualizações">
         <div class="preview card">
           <div class="head">Pré-visualização do template <span class="small">(auto)</span></div>
-          <img id="previewTemplate" alt="Pré-visualização do template" style="display:none;" />
+          <img id="previewTemplate" alt="Pré-visualização do template" style="display:none;" loading="lazy" />
         </div>
 
         <div class="preview card">
           <div class="head">Imagem & ponto focal <span class="small">(clica para definir)</span></div>
           <div class="image-stage" id="imageContainer">
-            <img id="image" alt="Imagem carregada" />
-            <div id="focusMarker"></div>
+            <img id="image" alt="Imagem carregada" loading="lazy" />
+            <div id="focusMarker" aria-hidden="true"></div>
           </div>
         </div>
       </section>
     </div>
   </div>
 
-  <div class="toast" id="toast">
-    <div class="dot"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="dot" aria-hidden="true"></div>
     <div>
       <div id="toastTitle" style="font-weight:700;">Sucesso</div>
       <div id="toastMsg" class="small">Dados enviados.</div>
     </div>
   </div>
 
-  <script>
+  <script defer>
     /* ============================================================
        Config: desligar histórico de links (não guarda nem mostra)
        ============================================================ */
     const SHOW_RECENTS = false;
 
-    // Theme handling com selector segmentado
+    // Theme handling com toggle segmentado (acessível)
     (function(){
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       const saved = localStorage.getItem('ui-theme');
@@ -279,8 +280,8 @@
         if(btnLight&&btnDark){
           btnLight.classList.toggle('active', !isDark);
           btnDark.classList.toggle('active',  isDark);
-          btnLight.setAttribute('aria-selected', String(!isDark));
-          btnDark.setAttribute('aria-selected',  String(isDark));
+          btnLight.setAttribute('aria-pressed', String(!isDark));
+          btnDark.setAttribute('aria-pressed',  String(isDark));
         }
       }
 
@@ -290,6 +291,13 @@
         const btnDark  = document.getElementById('themeDark');
         if (btnLight) btnLight.addEventListener('click', () => applyTheme('theme-light'));
         if (btnDark)  btnDark.addEventListener('click',  () => applyTheme('theme-dark'));
+        // teclas seta para alternar
+        document.querySelector('.theme-switch')?.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            const isDark = document.body.classList.contains('theme-dark');
+            applyTheme(isDark ? 'theme-light' : 'theme-dark');
+          }
+        });
       });
     })();
 
@@ -394,17 +402,23 @@
     let focusX = null;
     let focusY = null;
 
+    // Mostrar contagens sem forçar erro antes de interação
+    const touched = { title:false, subtitle:false, cta:false };
+
     function setCounter(name){
       const count = fields[name].value.length;
       const max = charLimits[name];
       const exceeded = count > max;
       counters[name].querySelector('strong').textContent = `${count}/${max}`;
       counters[name].classList.toggle('exceeded', exceeded);
-      fields[name].classList.toggle('error', exceeded || !fields[name].value.trim());
+      const invalid = exceeded || (touched[name] && !fields[name].value.trim());
+      fields[name].classList.toggle('error', invalid);
+      errors[name].style.display = invalid ? 'block' : 'none';
     }
 
     Object.keys(fields).forEach(name => {
       fields[name].addEventListener('input', () => setCounter(name));
+      fields[name].addEventListener('blur', () => { touched[name]=true; setCounter(name); });
       setCounter(name);
     });
 
@@ -437,8 +451,8 @@
     const IMG_FOLDER = 'https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link';
     const VID_FOLDER = 'https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link';
 
-    document.getElementById('btnImgFolder').addEventListener('click', () => window.open(IMG_FOLDER, '_blank'));
-    document.getElementById('btnVidFolder').addEventListener('click', () => window.open(VID_FOLDER, '_blank'));
+    document.getElementById('btnImgFolder').addEventListener('click', () => window.open(IMG_FOLDER, '_blank', 'noopener,noreferrer'));
+    document.getElementById('btnVidFolder').addEventListener('click', () => window.open(VID_FOLDER, '_blank', 'noopener,noreferrer'));
 
     async function fillFromClipboard(targetInput){
       try{
@@ -485,30 +499,35 @@
 
     document.getElementById('loadButton').addEventListener('click', loadImage);
 
-    // Click para definir ponto focal
+    // Erros de imagem
+    img.onerror = () => { showToast('Erro ao carregar imagem', 'Verifica o link ou permissões no Drive.', true); };
+    previewImg.onerror = () => { previewImg.style.display='none'; };
+
+    // Click para definir ponto focal (corrigido com offset do container)
     img.addEventListener('click', function(e){
-      const rect = img.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const clickY = e.clientY - rect.top;
-      focusX = Math.round((clickX / img.width) * 100);
-      focusY = Math.round((clickY / img.height) * 100);
-      const offsetX = clickX - 27; // centrar 54px
-      const offsetY = clickY - 27;
+      const rectImg  = img.getBoundingClientRect();
+      const rectWrap = document.getElementById('imageContainer').getBoundingClientRect();
+      const clickX = e.clientX - rectImg.left;
+      const clickY = e.clientY - rectImg.top;
+      focusX = Math.round((clickX / rectImg.width) * 100);
+      focusY = Math.round((clickY / rectImg.height) * 100);
+      const offsetX = (rectImg.left - rectWrap.left) + clickX - 27; // centrar 54px
+      const offsetY = (rectImg.top  - rectWrap.top)  + clickY - 27;
       marker.style.left = `${offsetX}px`;
       marker.style.top  = `${offsetY}px`;
       marker.style.display = 'block';
     });
 
-    function validate(){
+    function validate(submitting=false){
       const missing = [];
       ['title','subtitle','cta'].forEach(k => {
         const v = fields[k].value.trim();
         const tooLong = v.length > charLimits[k];
         const empty = !v;
         const invalid = empty || tooLong;
-        fields[k].classList.toggle('error', invalid);
-        const errKey = k === 'cta' ? 'cta' : k;
-        errors[errKey].style.display = invalid ? 'block' : 'none';
+        if (submitting) { touched[k] = true; }
+        fields[k].classList.toggle('error', invalid && touched[k]);
+        errors[k].style.display = (invalid && touched[k]) ? 'block' : 'none';
         if (invalid) missing.push(k === 'title' ? 'Título' : k === 'subtitle' ? 'Subtítulo' : 'Call to Action');
       });
       if(!imageUrlInput.value.trim()){
@@ -524,8 +543,16 @@
       return missing;
     }
 
+    // UUID simples para tracking
+    function uuid(){
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
+    }
+
     document.getElementById('submitButton').addEventListener('click', function(){
-      const missingFields = validate();
+      const missingFields = validate(true);
       if (missingFields.length > 0){
         showToast('Faltam campos', `Por favor corrige: ${missingFields.join(', ')}`, true);
         return;
@@ -534,6 +561,7 @@
       const videoUrl = videoUrlInput.value.trim();
       const template = templateSelect.value;
       const data = {
+        idOperacao: uuid(),
         title: fields.title.value.trim(),
         subtitle: fields.subtitle.value.trim(),
         cta: fields.cta.value.trim(),
@@ -543,15 +571,21 @@
         focus_y: focusY
       };
       if (videoUrl) data.video_url = videoUrl;
+
       fetch('https://hook.eu2.make.com/ud2ltvos440cz2b6kw82dykit54gxurv', {
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
-      }).catch(()=>{});
-      // Guardar os dois últimos links usados (respeita SHOW_RECENTS)
-      if (imageUrl) saveRecent('images', imageUrl);
-      if (videoUrl) saveRecent('videos', videoUrl);
-      showToast('Enviado', `Dados enviados com sucesso! X: ${focusX}% · Y: ${focusY}%`);
-      renderRecent('images','recentImages','imageUrlInput');
-      renderRecent('videos','recentVideos','videoUrlInput');
+      })
+      .then(() => {
+        // Guardar os dois últimos links usados (respeita SHOW_RECENTS)
+        if (imageUrl) saveRecent('images', imageUrl);
+        if (videoUrl) saveRecent('videos', videoUrl);
+        showToast('Enviado', `Dados enviados com sucesso! X: ${focusX}% · Y: ${focusY}%`);
+        renderRecent('images','recentImages','imageUrlInput');
+        renderRecent('videos','recentVideos','videoUrlInput');
+      })
+      .catch(() => {
+        showToast('Falhou envio', 'Tenta novamente em instantes.', true);
+      });
     });
   </script>
 </body>
