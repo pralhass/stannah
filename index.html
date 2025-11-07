@@ -143,6 +143,24 @@
           </select>
           <div class="small">A pré-visualização atualiza automaticamente. Os campos abaixo são gerados a partir do template.</div>
         </div>
+        <!-- Pastas de recursos (sempre visível) -->
+        <div class="form-row" id="driveResources">
+          <label>Pastas de recursos</label>
+          <div class="small">
+            📁 <a href="https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link"
+                  target="_blank" rel="noopener noreferrer">Abrir pasta de imagens no Drive</a><br>
+            📁 <a href="https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link"
+                  target="_blank" rel="noopener noreferrer">Abrir pasta de vídeos no Drive</a>
+          </div>
+        
+          <!-- Botões úteis (opcionais) -->
+          <div class="inline-actions" style="margin-top:8px">
+            <button type="button" id="btnImgFolder" class="btn-secondary" title="Abrir pasta de imagens">Abrir pasta de imagens</button>
+            <button type="button" id="btnVidFolder" class="btn-secondary" title="Abrir pasta de vídeos">Abrir pasta de vídeos</button>
+            <button type="button" id="btnImgPaste"  class="btn-primary"   title="Colar URL de imagem">Colar URL imagem</button>
+            <button type="button" id="btnVidPaste"  class="btn-primary"   title="Colar URL de vídeo">Colar URL vídeo</button>
+          </div>
+        </div>
 
         <!-- Host do formulário dinâmico -->
         <div id="dynamicForm"></div>
@@ -468,6 +486,34 @@ window.addEventListener('DOMContentLoaded', async function(){
   // templateSelect.value = Object.keys(registry)[0] || "";
   // if (templateSelect.value) mountDynamicFormFor(registry, templateSelect.value);
 });
+
+    // Pastas do Drive (sempre visíveis)
+const IMG_FOLDER = "https://drive.google.com/drive/folders/1kORvRCzEHPtGc-JtbnA2qC_fmPa5tvaf?usp=drive_link";
+const VID_FOLDER = "https://drive.google.com/drive/folders/1qNeGp5qICYrobO0LUd-hC_Xkg1rVAwZ5?usp=drive_link";
+
+// Abre as pastas
+document.getElementById('btnImgFolder')?.addEventListener('click', () =>
+  window.open(IMG_FOLDER, '_blank', 'noopener,noreferrer'));
+document.getElementById('btnVidFolder')?.addEventListener('click', () =>
+  window.open(VID_FOLDER, '_blank', 'noopener,noreferrer'));
+
+// Cola do clipboard para os campos dinâmicos (image_url / video_url)
+async function pasteToField(fieldId){
+  try{
+    const txt = (await navigator.clipboard.readText()).trim();
+    if(!txt){ showToast('Clipboard vazio','Copia primeiro o link.', true); return; }
+    const input = document.querySelector('#' + fieldId);
+    if(!input){ showToast('Sem campo ainda','Escolhe primeiro o template para gerar o formulário.', true); return; }
+    input.value = txt;
+    input.dispatchEvent(new Event('input')); // atualiza contadores/validações
+    showToast('Link colado','O URL foi preenchido com sucesso.');
+  }catch{
+    showToast('Sem acesso ao clipboard','Permite o acesso no navegador ou cola manualmente.', true);
+  }
+}
+document.getElementById('btnImgPaste')?.addEventListener('click', () => pasteToField('image_url'));
+document.getElementById('btnVidPaste')?.addEventListener('click', () => pasteToField('video_url'));
+
 
   </script>
 </body>
