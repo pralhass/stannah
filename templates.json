@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "templates": {
+    "StannahGuidelines": {
+      "label": "Stannah Guidelines",
+      "previewUrl": "https://drive.google.com/file/d/1G9oWyGbD2c9oUwmGmI-SUYYTm2RuIldW/view?usp=sharing",
+      "fields": [
+        {"id":"title","label":"Título","type":"textarea","required":true,"maxLength":40,"help":"Curto e direto."},
+        {"id":"subtitle","label":"Subtítulo","type":"textarea","required":true,"maxLength":90},
+        {"id":"cta","label":"CTA","type":"text","required":true,"maxLength":25,"placeholder":"Saber mais"},
+        {"id":"image_url","label":"URL da Imagem","type":"url","required":true,"help":"Aceita link do Drive (file/d/.../view)."},
+        {"id":"video_url","label":"URL do Vídeo","type":"url","required":false},
+        {"id":"badge","label":"Mostrar selo promocional?","type":"select","required":false,
+          "options":[{"value":"none","label":"Nenhum"},{"value":"sale","label":"Promoção"},{"value":"new","label":"Novo"}]
+        }
+      ],
+      "submitMap": {"title":"title","subtitle":"subtitle","cta":"cta","image_url":"image_url","video_url":"video_url","badge":"badge"}
+    },
+    "NewLookV3": {
+      "label": "New Look V3",
+      "previewUrl": "https://drive.google.com/file/d/1lzNWQFXRwnv0n5GrCfLl284TTLyyF5jM/view?usp=drive_link",
+      "fields": [
+        {"id":"headline","label":"Headline","type":"text","required":true,"maxLength":30},
+        {"id":"body","label":"Texto","type":"textarea","required":true,"maxLength":120},
+        {"id":"cta","label":"CTA","type":"text","required":true,"maxLength":20},
+        {"id":"image_url","label":"URL da Imagem","type":"url","required":true},
+        {"id":"theme","label":"Tema","type":"select","required":true,"options":[{"value":"light","label":"Claro"},{"value":"dark","label":"Escuro"}]},
+        {"id":"contrast","label":"Contraste extra","type":"switch","required":false,"visibleIf":{"field":"theme","equals":"dark"}}
+      ],
+      "submitMap": {"headline":"title","body":"subtitle","cta":"cta","image_url":"image_url","theme":"theme","contrast":"contrast"}
+    }
+  }
+}
