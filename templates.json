@@ -246,20 +246,6 @@
           "maxLength": 40
         },
         {
-          "id": "subtitle",
-          "label": "Subtítulo",
-          "type": "textarea",
-          "required": true,
-          "maxLength": 90
-        },
-        {
-          "id": "cta",
-          "label": "CTA",
-          "type": "text",
-          "required": true,
-          "maxLength": 25
-        },
-        {
           "id": "image_url",
           "label": "URL da Imagem",
           "type": "url",
@@ -298,25 +284,7 @@
           "required": true,
           "maxLength": 90
         },
-        {
-          "id": "cta",
-          "label": "CTA",
-          "type": "text",
-          "required": true,
-          "maxLength": 25
-        },
-        {
-          "id": "image_url",
-          "label": "URL da Imagem",
-          "type": "url",
-          "required": true
-        },
-        {
-          "id": "video_url",
-          "label": "URL do Vídeo",
-          "type": "url",
-          "required": false
-        }
+
       ],
       "submitMap": {
         "title": "title",
@@ -336,20 +304,6 @@
           "type": "textarea",
           "required": true,
           "maxLength": 40
-        },
-        {
-          "id": "subtitle",
-          "label": "Subtítulo",
-          "type": "textarea",
-          "required": true,
-          "maxLength": 90
-        },
-        {
-          "id": "cta",
-          "label": "CTA",
-          "type": "text",
-          "required": true,
-          "maxLength": 25
         },
         {
           "id": "image_url",
