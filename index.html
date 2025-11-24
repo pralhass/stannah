@@ -271,7 +271,9 @@ function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, 
 /* =========================
    LOADER DE TEMPLATES
    ========================= */
-async function () {
+
+// Carrega templates diretamente do GitHub RAW
+async function loadFromGitHub() {
   const res = await fetch(GITHUB_TPL_URL, { cache: "no-store" });
 
   if (!res.ok) {
@@ -280,14 +282,12 @@ async function () {
 
   const json = await res.json();
 
-  // aceita { version: 1, templates: {...} } ou {...} diretamente
-  if (json && json.templates) return json.templates;
-  return json;
+  // Suporta formato {version, templates:{...}} ou apenas {...}
+  return json.templates || json;
 }
 
 async function loadTemplates() {
   try {
-    // ✅ Só GitHub
     return await loadFromGitHub();
   } catch (e) {
     console.error("Erro a carregar templates do GitHub:", e);
@@ -299,6 +299,7 @@ async function loadTemplates() {
     return {};
   }
 }
+
 
 
 
