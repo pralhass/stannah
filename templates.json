@@ -260,40 +260,35 @@
       ],
       "submitMap": {
         "title": "title",
-        "subtitle": "subtitle",
-        "cta": "cta",
         "image_url": "image_url",
         "video_url": "video_url"
       }
     },
-    "Grafica": {
-      "label": "Grafica - Dolci",
-      "previewUrl": "https://drive.google.com/file/d/1RQ_a0tkbyW8op6HPTINAX-vkWzYKkGG_/view?usp=drive_link",
-      "fields": [
-        {
-          "id": "title",
-          "label": "Título",
-          "type": "textarea",
-          "required": true,
-          "maxLength": 40
-        },
-        {
-          "id": "subtitle",
-          "label": "Subtítulo",
-          "type": "textarea",
-          "required": true,
-          "maxLength": 90
-        },
+"Grafica": {
+  "label": "Grafica - Dolci",
+  "previewUrl": "https://drive.google.com/file/d/1RQ_a0tkbyW8op6HPTINAX-vkWzYKkGG_/view?usp=drive_link",
+  "fields": [
+    {
+      "id": "title",
+      "label": "Título",
+      "type": "textarea",
+      "required": true,
+      "maxLength": 40
+    },
+    {
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "type": "textarea",
+      "required": true,
+      "maxLength": 90
+    }
+  ],
+  "submitMap": {
+    "title": "title",
+    "subtitle": "subtitle"
+  }
+},
 
-      ],
-      "submitMap": {
-        "title": "title",
-        "subtitle": "subtitle",
-        "cta": "cta",
-        "image_url": "image_url",
-        "video_url": "video_url"
-      }
-    },
     "Ambientata": {
       "label": "Ambientata - Dolci",
       "previewUrl": "https://drive.google.com/file/d/1ilGFEd-C3kv8LZiiHyQw1GaRLoTPSWMc/view?usp=drive_link",
@@ -320,8 +315,6 @@
       ],
       "submitMap": {
         "title": "title",
-        "subtitle": "subtitle",
-        "cta": "cta",
         "image_url": "image_url",
         "video_url": "video_url"
       }
