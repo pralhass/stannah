@@ -271,33 +271,35 @@ function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, 
 /* =========================
    LOADER DE TEMPLATES
    ========================= */
-async function loadFromGitHub(){
+async function () {
   const res = await fetch(GITHUB_TPL_URL, { cache: "no-store" });
-  if (!res.ok) throw new Error("GitHub " + res.status);
+
+  if (!res.ok) {
+    throw new Error("GitHub " + res.status);
+  }
+
   const json = await res.json();
-  // aceita {templates:{...}} ou {...} diretamente
+
+  // aceita { version: 1, templates: {...} } ou {...} diretamente
   if (json && json.templates) return json.templates;
   return json;
 }
-async function loadFromDrive(){
-  if (!DRIVE_FILE_ID) throw new Error("Drive FILE_ID vazio");
-  const url = "https://drive.google.com/uc?export=download&id=" + DRIVE_FILE_ID;
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error("Drive " + res.status);
-  const json = await res.json();
-  if (json && json.templates) return json.templates;
-  return json;
-}
-async function loadTemplates(){
+
+async function loadTemplates() {
   try {
-    // só tenta ir ao GitHub
+    // ✅ Só GitHub
     return await loadFromGitHub();
   } catch (e) {
-    console.error("GitHub falhou:", e);
-    showToast("Er...", "Não foi possível carregar templates.json do GitHub", true);
+    console.error("Erro a carregar templates do GitHub:", e);
+    showToast(
+      "Er...",
+      "Não foi possível carregar templates.json do GitHub",
+      true
+    );
     return {};
   }
 }
+
 
 
 /* =========================
