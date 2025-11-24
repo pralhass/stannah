@@ -289,13 +289,16 @@ async function loadFromDrive(){
   return json;
 }
 async function loadTemplates(){
-  try { return await loadFromGitHub(); }
-  catch(e1){
-    console.warn("GitHub falhou:", e1);
-    try { return await loadFromDrive(); }
-    catch(e2){ console.error("Drive falhou:", e2); showToast("Erro","Não foi possível carregar templates.json",true); return {}; }
+  try {
+    // só tenta ir ao GitHub
+    return await loadFromGitHub();
+  } catch (e) {
+    console.error("GitHub falhou:", e);
+    showToast("Er...", "Não foi possível carregar templates.json do GitHub", true);
+    return {};
   }
 }
+
 
 /* =========================
    UI DINÂMICA
