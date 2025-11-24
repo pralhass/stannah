@@ -116,6 +116,15 @@
 
     .inline-actions{display:flex;gap:8px}
     .inline-actions button{width:auto}
+
+    .counter strong.over-limit {
+      color: #ef4444; /* vermelho */
+    }
+      .form-row.over-limit textarea,
+      .form-row.over-limit input[type="text"] {
+      border-color: #ef4444;
+    }
+
   </style>
 </head>
 <body class="theme-dark">
@@ -339,20 +348,35 @@ function createFieldControl(field){
   input.id = field.id; input.name = field.id;
   if (field.placeholder) input.placeholder = field.placeholder;
   if (field.required) input.required = true;
-  if (field.maxLength && input.tagName !== 'SELECT' && input.type !== 'checkbox') input.maxLength = field.maxLength;
+  //if (field.maxLength && input.tagName !== 'SELECT' && input.type !== 'checkbox') input.maxLength = field.maxLength;
   row.appendChild(input);
 
-  if (field.help || field.maxLength){
-    const meta = document.createElement('div');
-    meta.className = 'counter';
-    meta.innerHTML = '<span>' + (field.help || '') + '</span><strong>' + (field.maxLength ? ('0/'+field.maxLength) : '') + '</strong>';
-    row.appendChild(meta);
-    if (field.maxLength){
-      input.addEventListener('input', function(){
-        meta.querySelector('strong').textContent = (input.value || '').length + '/' + field.maxLength;
-      });
-    }
+if (field.help || field.maxLength){
+  const meta = document.createElement('div');
+  meta.className = 'counter';
+  meta.innerHTML =
+    '<span>' + (field.help || '') + '</span>' +
+    '<strong>' + (field.maxLength ? ('0/' + field.maxLength) : '') + '</strong>';
+
+  row.appendChild(meta);
+
+  if (field.maxLength){
+    const counterStrong = meta.querySelector('strong');
+
+    const updateCounter = function(){
+      const len = (input.value || '').length;
+      counterStrong.textContent = len + '/' + field.maxLength;
+      const over = len > field.maxLength;
+      counterStrong.classList.toggle('over-limit', over);
+      row.classList.toggle('over-limit', over);
+    };
+
+    input.addEventListener('input', updateCounter);
+    // inicializar
+    updateCounter();
   }
+}
+
 
   const err = document.createElement('div');
   err.className = 'error-msg'; err.style.display = 'none';
@@ -391,32 +415,56 @@ function mountDynamicFormFor(registry, templateKey){
 }
 
 function validateAndBuildPayload(registry, templateKey){
-  const tpl = registry[templateKey]; if (!tpl) return { ok:false, errors:['Template inválido'] };
-  const errors = []; const data = {};
+  const tpl = registry[templateKey];
+  if (!tpl) return { ok: false, errors: ['Template inválido'], warnings: [] };
+
+  const errors = [];
+  const warnings = [];
+  const data = {};
+
   (tpl.fields || []).forEach(function(f){
     f = normField(f);
-    const el = formHost.querySelector('[name="'+f.id+'"]'); if (!el) return;
+    const el = formHost.querySelector('[name="' + f.id + '"]');
+    if (!el) return;
+
     const row = el.closest('.form-row');
     if (row && row.style.display === 'none') return;
+
     const val = (el.type === 'checkbox') ? el.checked : (el.value || '').trim();
 
+    // obrigatórios
     if (f.required && (val === '' || val === false)){
       errors.push(f.label || f.id);
-      el.classList.add('error'); if (row) row.querySelector('.error-msg').style.display = 'block';
+      el.classList.add('error');
+      if (row) row.querySelector('.error-msg').style.display = 'block';
     } else {
-      el.classList.remove('error'); if (row) row.querySelector('.error-msg').style.display = 'none';
+      el.classList.remove('error');
+      if (row) row.querySelector('.error-msg').style.display = 'none';
     }
-    if (f.maxLength && typeof val === 'string' && val.length > f.maxLength){
-      errors.push((f.label || f.id) + ' excede ' + f.maxLength);
-      el.classList.add('error'); if (row) row.querySelector('.error-msg').style.display = 'block';
+
+    // maxLength → aviso (não bloqueia)
+    if (f.maxLength && typeof val === 'string'){
+      const len = val.length;
+      if (len > f.maxLength){
+        warnings.push((f.label || f.id) + ' excede o limite de ' + f.maxLength + ' caracteres');
+        if (row) row.classList.add('over-limit');
+      } else if (row){
+        row.classList.remove('over-limit');
+      }
     }
+
     data[f.id] = val;
   });
-  if (errors.length) return { ok:false, errors };
-  const mapped = {}; const map = tpl.submitMap || {};
-  Object.keys(data).forEach(function(k){ mapped[map[k] || k] = data[k]; });
-  return { ok:true, payload: mapped };
+
+  const mapped = {};
+  const map = tpl.submitMap || {};
+  Object.keys(data).forEach(function(k){
+    mapped[map[k] || k] = data[k];
+  });
+
+  return { ok: errors.length === 0, errors, warnings, payload: mapped };
 }
+
 
 /* =========================
    IMAGEM & PONTO FOCAL
@@ -456,19 +504,44 @@ img.addEventListener('click', function(e){
 /* =========================
    SUBMISSÃO
    ========================= */
-document.getElementById('submitButton').addEventListener('click', async function(){
+document.getElementById('submitButton')?.addEventListener('click', async function(){
   const t = templateSelect.value;
   const res = validateAndBuildPayload(window.__TEMPLATE_REGISTRY__ || {}, t);
-  if (!res.ok){ showToast('Faltam campos', 'Por favor corrige: ' + res.errors.join(', '), true); return; }
+
+  if (!res.ok){
+    showToast('Faltam campos', 'Por favor corrige: ' + res.errors.join(', '), true);
+    return;
+  }
+
+  // ⚠️ Aviso antes de enviar se houver campos a ultrapassar o limite recomendado
+  if (res.warnings && res.warnings.length){
+    const mensagem =
+      'Alguns campos ultrapassam o limite recomendado de caracteres:\n\n- ' +
+      res.warnings.join('\n- ') +
+      '\n\nPodes continuar, mas algo pode depois não funcionar bem nos anúncios.\n\nQueres enviar à mesma?';
+
+    const continuar = window.confirm(mensagem);
+    if (!continuar) return;
+  }
+
   const finalPayload = { idOperacao: uuid(), template: t, ...res.payload };
-  if (focusX !== null && focusY !== null){ finalPayload.focus_x = focusX; finalPayload.focus_y = focusY; }
+  if (focusX !== null && focusY !== null){
+    finalPayload.focus_x = focusX;
+    finalPayload.focus_y = focusY;
+  }
+
   try{
-    await fetch(SUBMIT_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(finalPayload) });
+    await fetch(SUBMIT_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify(finalPayload)
+    });
     showToast('Enviado', 'Dados enviados com sucesso!');
   }catch(e){
     showToast('Falhou envio', 'Tenta novamente em instantes.', true);
   }
 });
+
 
 /* =========================
    BOOTSTRAP
